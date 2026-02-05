@@ -1,0 +1,22 @@
+
+services:
+
+  user-service:
+    build:
+      context: ./BackEnd/user-service
+    container_name: user-service
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8081:8081"
+
+  account-service:
+    build:
+      context: ./BackEnd/account-service
+    container_name: account-service
+    depends_on:
+      - user-service
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8082:8082"

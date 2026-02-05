@@ -1,0 +1,423 @@
+{
+	"info": {
+		"_postman_id": "4871246d-9892-4356-94f6-d5dc2a76aaaf",
+		"name": "Tata test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24119807"
+	},
+	"item": [
+		{
+			"name": "Movimiento",
+			"item": [
+				{
+					"name": "createMovimiento",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"numeroCuenta\": \"ACC9725871072\",\r\n  \"fecha\": \"2025-07-22T10:30:00.000Z\",\r\n  \"valor\": -20,\r\n  \"tipo\": \"Corriente\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8082/movimientos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"movimientos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getMovementsByCountNumber",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/movimientos/cuenta/ACC6925289723",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"movimientos",
+								"cuenta",
+								"ACC6925289723"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllMovimientos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/movimientos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"movimientos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteMovimiento",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/movimientos/494302",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"movimientos",
+								"494302"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "editMovimiento",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"numeroCuenta\": \"ACC0000000123\",\r\n  \"fecha\": \"2025-07-24T00:00:00.000+00:00\",\r\n  \"valor\": 700,\r\n  \"tipo\": \"RETIRO\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8082/movimientos/494302",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"movimientos",
+								"494302"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Clientes",
+			"item": [
+				{
+					"name": "getClientes",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/clientes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"clientes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getClienteById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/clientes/70355",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"clientes",
+								"70355"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateCliente",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nombre\": \"Chespirito Actualizado\",\r\n  \"genero\": \"Masculino\",\r\n  \"edad\": 24,\r\n  \"identificacion\": \"1234567895\",\r\n  \"direccion\": \"Av. Nueva 123\",\r\n  \"telefono\": \"0999999999\",\r\n  \"contrasena\": \"OtraContrasena123\",\r\n  \"estado\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/clientes/70355",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"clientes",
+								"70355"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createClientes",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nombre\": \"Chespirito1\",\r\n  \"genero\": \"Masculino\",\r\n  \"edad\": 23,\r\n  \"identificacion\": \"1234567897\",\r\n  \"direccion\": \"Av. Siempre Viva 742\",\r\n  \"telefono\": \"0991234567\",\r\n  \"contrasena\": \"MiContrasenaSegura123\",\r\n  \"estado\": true\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/clientes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"clientes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteClientes",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/clientes/70355",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"clientes",
+								"70355"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cuentas",
+			"item": [
+				{
+					"name": "createCuenta",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"clienteId\": 34426,\r\n    \"tipoCuenta\": \"AHORROS\",\r\n    \"saldoInicial\": 50\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8082/cuentas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"cuentas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getReport",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/cuentas/reportes/estado-cuenta?clienteId=70355&desde=2022-02-01&hasta=2025-07-24",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"cuentas",
+								"reportes",
+								"estado-cuenta"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "70355"
+								},
+								{
+									"key": "desde",
+									"value": "2022-02-01"
+								},
+								{
+									"key": "hasta",
+									"value": "2025-07-24"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getCuentaById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/cuentas/858770",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"cuentas",
+								"858770"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getCuentaByClientId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/cuentas/cliente/34426",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"cuentas",
+								"cliente",
+								"34426"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteCuentaById",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/cuentas/858770",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"cuentas",
+								"858770"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "editCuenta",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"clienteId\": 34426,\r\n  \"tipoCuenta\": \"CORRIENTE\",\r\n  \"saldoInicial\": 2000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8082/cuentas/858770",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"cuentas",
+								"858770"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

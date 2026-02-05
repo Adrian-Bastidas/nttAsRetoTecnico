@@ -1,5 +1,16 @@
+server:
+  port: 8082
+
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/tcsDb
+    url: jdbc:postgresql://host.docker.internal:5432/nttdb
     username: abastidas
-    password: tcsRodio
+    password: nttRodio
+
+user-service:
+  url: http://user-service:8081
+
+logging:
+  level:
+    com.ntt.account_service.client: DEBUG
+    feign: DEBUG
