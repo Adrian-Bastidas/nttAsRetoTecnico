@@ -1,0 +1,53 @@
+/* delete-confirmation-modal.component.css */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-container {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-title {
+  font-size: 18px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+button {
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  flex: 1;
+}
+
+.cancel-button {
+  background-color: #e9ecef;
+  color: #051b2c;
+}
+
+.confirm-button {
+  background-color: #ffdd62;
+  color: #051b2c;
+}

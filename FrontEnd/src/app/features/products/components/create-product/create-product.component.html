@@ -1,0 +1,146 @@
+<div class="sizeCard">
+  <div class="create-form">
+    <div class="form-container">
+      <div class="back-button">
+        <div
+          class="btn-back"
+          (click)="goToList()"
+          role="button"
+          tabindex="0"
+          aria-label="Regresar a la lista"
+        >
+          <i class="fa fa-arrow-left" aria-hidden="true"></i>
+          Regresar
+        </div>
+      </div>
+      <h2>Formulario de Registro</h2>
+      <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="id-input">ID</label>
+            <input
+              id="id-input"
+              formControlName="id"
+              maxlength="10"
+              [class.error]="f['id'].invalid && f['id'].touched"
+            />
+            <div
+              *ngIf="f['id'].invalid && f['id'].touched"
+              class="error-message"
+              role="alert"
+            >
+              ¡ID no válido!
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="name-input">Nombre</label>
+            <input
+              id="name-input"
+              formControlName="name"
+              maxlength="100"
+              [class.error]="f['name'].invalid && f['name'].touched"
+            />
+            <div
+              *ngIf="f['name'].invalid && f['name'].touched"
+              class="error-message"
+              role="alert"
+            >
+              Este campo es requerido!
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description-input">Descripción</label>
+            <input
+              id="description-input"
+              formControlName="description"
+              maxlength="200"
+              [class.error]="
+                f['description'].invalid && f['description'].touched
+              "
+            />
+            <div
+              *ngIf="f['description'].invalid && f['description'].touched"
+              class="error-message"
+              role="alert"
+            >
+              Este campo es requerido!
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="logo-input">Logo</label>
+            <input
+              id="logo-input"
+              formControlName="logo"
+              [class.error]="f['logo'].invalid && f['logo'].touched"
+            />
+            <div
+              *ngIf="f['logo'].invalid && f['logo'].touched"
+              class="error-message"
+              role="alert"
+            >
+              Este campo es requerido!
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="date-release-input">Fecha Liberación</label>
+            <input
+              id="date-release-input"
+              type="text"
+              maxlength="10"
+              formControlName="date_release"
+              placeholder="aaaa-mm-dd"
+              (input)="onDateInput($event)"
+              (keydown)="preventInvalidKeys($event)"
+              [class.error]="
+                f['date_release'].invalid && f['date_release'].touched
+              "
+            />
+            <div
+              *ngIf="f['date_release'].invalid && f['date_release'].touched"
+              class="error-message"
+              role="alert"
+            >
+              Este campo es requerido!
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="date-revision-input">Fecha Revisión</label>
+            <input
+              id="date-revision-input"
+              formControlName="date_revision"
+              readonly
+            />
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button type="button" class="btn-reset" (click)="reiniciar()">
+            Reiniciar
+          </button>
+          <button
+            type="submit"
+            class="btn-submit"
+            [disabled]="formulario.invalid"
+          >
+            Enviar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<app-short-pop-up
+  [show]="mostrarPopup"
+  [type]="
+    typeModal === 'success' || typeModal === 'error' ? typeModal : 'error'
+  "
+  [message]="message"
+  [showAcceptButton]="true"
+  (close)="mostrarPopup = false"
+></app-short-pop-up>

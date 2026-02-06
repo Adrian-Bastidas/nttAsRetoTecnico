@@ -1,5 +1,6 @@
 package com.ntt.account_service.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ntt.account_service.dtos.cliente.ClienteVo;
 import com.ntt.account_service.dtos.cuenta.CuentaRequestDTO;
 import com.ntt.account_service.dtos.cuenta.CuentaResponseVo;
@@ -11,6 +12,7 @@ import com.ntt.account_service.model.Cuenta;
 import com.ntt.account_service.model.Movimiento;
 import com.ntt.account_service.repository.CuentaRepository;
 import com.ntt.account_service.repository.MovimientoRepository;
+import com.ntt.account_service.utils.ApiResponse;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,9 @@ public class CuentaService {
     @Autowired
     private CuentaMapper cuentaMapper;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private final SecureRandom random = new SecureRandom();
     private static final Logger logger = LoggerFactory.getLogger(CuentaService.class);
     @Autowired
@@ -47,7 +52,13 @@ public class CuentaService {
 
         ClienteVo cliente;
         try {
-            cliente = userServiceClient.obtenerCliente(cuentaDTO.getClienteId());
+
+            ApiResponse<?> response = userServiceClient.obtenerCliente(cuentaDTO.getClienteId());
+
+            cliente = objectMapper.convertValue(
+                    response.getData(),
+                    ClienteVo.class
+            );
             if (cliente == null) {
                 logger.warn("Cliente con ID {} no encontrado", cuentaDTO.getClienteId());
                 throw new ClienteNoEncontradoException("Cliente con ID " + cuentaDTO.getClienteId() + " no encontrado");
@@ -91,7 +102,14 @@ public class CuentaService {
         CuentaResponseVo cuentaVO = cuentaMapper.entityToVO(cuenta);
 
         try {
-            ClienteVo cliente = userServiceClient.obtenerCliente(cuenta.getClienteId());
+
+            ApiResponse<?> response = userServiceClient.obtenerCliente(cuenta.getClienteId());
+
+            ClienteVo cliente = objectMapper.convertValue(
+                    response.getData(),
+                    ClienteVo.class
+            );
+
             cuentaVO.setCliente(cliente);
             logger.info("Información de cliente agregada a cuenta ID: {}", cuentaId);
         } catch (Exception e) {
@@ -104,7 +122,13 @@ public class CuentaService {
     public List<CuentaResponseVo> obtenerCuentasPorCliente(Long clienteId) {
         logger.info("Buscando cuentas activas para cliente ID: {}", clienteId);
         try {
-            ClienteVo cliente = userServiceClient.obtenerCliente(clienteId);
+            ApiResponse<?> response = userServiceClient.obtenerCliente(clienteId);
+
+            ClienteVo cliente = objectMapper.convertValue(
+                    response.getData(),
+                    ClienteVo.class
+            );
+
             if (cliente == null) {
                 logger.warn("Cliente con ID {} no encontrado", clienteId);
                 throw new ClienteNoEncontradoException("Cliente no encontrado");
@@ -123,6 +147,39 @@ public class CuentaService {
 
         } catch (Exception e) {
             logger.error("Error al obtener cuentas del cliente {}: {}", clienteId, e.getMessage(), e);
+            throw new ClienteNoEncontradoException("Error al obtener cuentas del cliente: " + e.getMessage());
+        }
+    }
+
+    public List<CuentaResponseVo> obtenerCuentasPorClienteIdentificacion(String identificacion) {
+        logger.info("Buscando cuentas activas para cliente identificacion: {}", identificacion);
+        try {
+            ApiResponse<?> response =
+                    userServiceClient.obtenerClienteIdentificacion(identificacion);
+
+            ClienteVo cliente = objectMapper.convertValue(
+                    response.getData(),
+                    ClienteVo.class
+            );
+            logger.info("cliente {}", cliente);
+            if (cliente == null) {
+                logger.warn("Cliente con ID {} no encontrado", identificacion);
+                throw new ClienteNoEncontradoException("Cliente no encontrado");
+            }logger.info("cliente {}", cliente.getClienteId());
+
+            List<Cuenta> cuentas = cuentaRepository.findByClienteIdAndEstado(cliente.getClienteId(), true);
+            logger.info("Se encontraron {} cuentas activas para el cliente {}", cuentas.size(), identificacion);
+
+            return cuentas.stream()
+                    .map(cuenta -> {
+                        CuentaResponseVo vo = cuentaMapper.entityToVO(cuenta);
+                        vo.setCliente(cliente);
+                        return vo;
+                    })
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            logger.error("Error al obtener cuentas del cliente {}: {}", identificacion, e.getMessage(), e);
             throw new ClienteNoEncontradoException("Error al obtener cuentas del cliente: " + e.getMessage());
         }
     }
@@ -155,7 +212,14 @@ public class CuentaService {
 
         ClienteVo cliente;
         try {
-            cliente = userServiceClient.obtenerCliente(clienteId);
+
+            ApiResponse<?> response = userServiceClient.obtenerCliente(clienteId);
+
+            cliente = objectMapper.convertValue(
+                    response.getData(),
+                    ClienteVo.class
+            );
+
             if (cliente == null) {
                 logger.warn("Cliente con ID {} no encontrado", clienteId);
                 throw new ClienteNoEncontradoException("Cliente con ID " + clienteId + " no encontrado");
@@ -214,7 +278,13 @@ public class CuentaService {
 
         ClienteVo cliente;
         try {
-            cliente = userServiceClient.obtenerCliente(cuentaDTO.getClienteId());
+
+            ApiResponse<?> response = userServiceClient.obtenerCliente(cuentaDTO.getClienteId());
+
+            cliente = objectMapper.convertValue(
+                    response.getData(),
+                    ClienteVo.class
+            );
             if (cliente == null) {
                 logger.warn("Cliente con ID {} no encontrado", cuentaDTO.getClienteId());
                 throw new ClienteNoEncontradoException("Cliente con ID " + cuentaDTO.getClienteId() + " no encontrado");

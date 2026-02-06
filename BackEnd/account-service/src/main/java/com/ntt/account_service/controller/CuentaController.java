@@ -4,6 +4,7 @@ import com.ntt.account_service.dtos.cuenta.CuentaRequestDTO;
 import com.ntt.account_service.dtos.cuenta.CuentaResponseVo;
 import com.ntt.account_service.dtos.cuenta.EstadoCuentaReporteVO;
 import com.ntt.account_service.service.CuentaService;
+import com.ntt.account_service.utils.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/cuentas")
 @Validated
@@ -23,43 +24,72 @@ public class CuentaController {
     private CuentaService cuentaService;
 
     @PostMapping
-    public ResponseEntity<CuentaResponseVo> crearCuenta(@Valid @RequestBody CuentaRequestDTO cuentaDTO) {
+    public ResponseEntity<ApiResponse<CuentaResponseVo>> crearCuenta(
+            @Valid @RequestBody CuentaRequestDTO cuentaDTO) {
+
         CuentaResponseVo cuentaCreada = cuentaService.crearCuenta(cuentaDTO);
-        return new ResponseEntity<>(cuentaCreada, HttpStatus.CREATED);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Cuenta creada correctamente", cuentaCreada));
     }
 
     @GetMapping("/{cuentaId}")
-    public ResponseEntity<CuentaResponseVo> obtenerCuenta(@PathVariable Long cuentaId) {
+    public ResponseEntity<ApiResponse<CuentaResponseVo>> obtenerCuenta(
+            @PathVariable Long cuentaId) {
+
         CuentaResponseVo cuenta = cuentaService.obtenerCuenta(cuentaId);
-        return ResponseEntity.ok(cuenta);
+        return ResponseEntity.ok(ApiResponse.success(cuenta));
     }
 
     @GetMapping("/cliente/{clienteId}")
-    public ResponseEntity<List<CuentaResponseVo>> obtenerCuentasPorCliente(@PathVariable Long clienteId) {
+    public ResponseEntity<ApiResponse<List<CuentaResponseVo>>> obtenerCuentasPorCliente(
+            @PathVariable Long clienteId) {
+
         List<CuentaResponseVo> cuentas = cuentaService.obtenerCuentasPorCliente(clienteId);
-        return ResponseEntity.ok(cuentas);
+        return ResponseEntity.ok(ApiResponse.success(cuentas));
+    }
+
+    @GetMapping("/cliente/cedula/{identificacion}")
+    public ResponseEntity<ApiResponse<List<CuentaResponseVo>>> obtenerCuentasPorCliente(
+            @PathVariable String identificacion) {
+
+        List<CuentaResponseVo> cuentas = cuentaService.obtenerCuentasPorClienteIdentificacion(identificacion);
+        return ResponseEntity.ok(ApiResponse.success(cuentas));
     }
 
     @DeleteMapping("/{cuentaId}")
-    public ResponseEntity<Void> desactivarCuenta(@PathVariable Long cuentaId) {
+    public ResponseEntity<ApiResponse<Void>> desactivarCuenta(
+            @PathVariable Long cuentaId) {
+
         cuentaService.desactivarCuenta(cuentaId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                ApiResponse.success("Cuenta desactivada correctamente", null)
+        );
     }
+
     @GetMapping("/reportes/estado-cuenta")
-    public ResponseEntity<List<EstadoCuentaReporteVO>> generarReporteEstadoCuenta(
+    public ResponseEntity<ApiResponse<List<EstadoCuentaReporteVO>>> generarReporteEstadoCuenta(
             @RequestParam Long clienteId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date desde,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date hasta) {
 
-        List<EstadoCuentaReporteVO> reporte = cuentaService.generarReporte(clienteId, desde, hasta);
-        return ResponseEntity.ok(reporte);
+        List<EstadoCuentaReporteVO> reporte =
+                cuentaService.generarReporte(clienteId, desde, hasta);
+
+        return ResponseEntity.ok(ApiResponse.success(reporte));
     }
+
     @PutMapping("/{cuentaId}")
-    public ResponseEntity<CuentaResponseVo> actualizarCuenta(
+    public ResponseEntity<ApiResponse<CuentaResponseVo>> actualizarCuenta(
             @PathVariable Long cuentaId,
             @Valid @RequestBody CuentaRequestDTO cuentaDTO) {
-        CuentaResponseVo cuentaActualizada = cuentaService.actualizarCuenta(cuentaId, cuentaDTO);
-        return ResponseEntity.ok(cuentaActualizada);
+
+        CuentaResponseVo cuentaActualizada =
+                cuentaService.actualizarCuenta(cuentaId, cuentaDTO);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Cuenta actualizada correctamente", cuentaActualizada)
+        );
     }
 
 }

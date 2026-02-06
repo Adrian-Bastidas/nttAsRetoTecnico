@@ -1,0 +1,19 @@
+<nav class="sidebar">
+  <ul>
+    <li [class.selected]="selected === 1" (click)="navigate(1, '/')">
+      Clientes
+    </li>
+
+    <li [class.selected]="selected === 2" (click)="navigate(2, '/cuentas')">
+      Cuentas
+    </li>
+
+    <li [class.selected]="selected === 3" (click)="navigate(3, '/movimientos')">
+      Movimientos
+    </li>
+
+    <li [class.selected]="selected === 4" (click)="navigate(4, '/reportes')">
+      Reportes
+    </li>
+  </ul>
+</nav>

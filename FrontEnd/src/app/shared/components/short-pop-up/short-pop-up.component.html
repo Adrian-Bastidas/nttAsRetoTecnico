@@ -1,0 +1,22 @@
+<div class="popup-backdrop" *ngIf="show">
+  <div class="popup-container fade-in">
+    <div class="icon-container">
+      <i
+        class="fa fa-exclamation-triangle"
+        [class.success]="type === 'success'"
+        [class.error]="type === 'error'"
+        aria-hidden="true"
+      ></i>
+    </div>
+
+    <div class="message">{{ message }}</div>
+
+    <button
+      *ngIf="showAcceptButton"
+      class="accept-button"
+      (click)="closePopup()"
+    >
+      Aceptar
+    </button>
+  </div>
+</div>

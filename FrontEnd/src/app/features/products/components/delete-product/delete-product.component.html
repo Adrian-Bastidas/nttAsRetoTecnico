@@ -1,0 +1,14 @@
+<div class="modal-overlay" *ngIf="productoAEliminar">
+  <div class="modal-container">
+    <div class="modal-content">
+      <h2 class="modal-title">
+        ¿Estás seguro de eliminar el producto {{ productoAEliminar.name }}?
+      </h2>
+
+      <div class="modal-actions">
+        <button class="cancel-button" (click)="onCancel()">Cancelar</button>
+        <button class="confirm-button" (click)="onConfirm()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,7 @@
+<app-short-pop-up
+  [show]="popupService.popupState().show"
+  [type]="popupService.popupState().type"
+  [message]="popupService.popupState().message"
+  [showAcceptButton]="popupService.popupState().showAcceptButton"
+  (close)="handleClose()"
+></app-short-pop-up>

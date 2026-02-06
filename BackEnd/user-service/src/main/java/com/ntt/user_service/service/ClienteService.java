@@ -119,4 +119,17 @@ public class ClienteService {
         logger.debug("Cliente encontrado: ID {} - Identificación: {}", id, cliente.getIdentificacion());
         return clienteMapper.entityToVo(cliente);
     }
+
+    public ClienteResponseVo getClientebycedula(String identificacion) {
+        logger.info("Consultando cliente con identificacion: {}", identificacion);
+
+        Cliente cliente = clienteRepository.findByIdentificacion(identificacion)
+                .orElseThrow(() -> {
+                    logger.warn("Cliente no encontrado con identificacion: {}", identificacion);
+                    return new ResourceNotFoundException("Cliente no encontrado con identificacion: " + identificacion);
+                });
+
+        logger.debug("Cliente encontrado: ID {} - Identificación: {}", identificacion, cliente.getIdentificacion());
+        return clienteMapper.entityToVo(cliente);
+    }
 }

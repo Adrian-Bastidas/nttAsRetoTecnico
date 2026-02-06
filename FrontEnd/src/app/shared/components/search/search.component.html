@@ -1,0 +1,10 @@
+<div class="search-container">
+  <input
+    type="search"
+    [(ngModel)]="searchTerm"
+    [placeholder]="placeholder"
+    [attr.aria-label]="ariaLabel"
+    (ngModelChange)="onSearch($event)"
+    class="search-input"
+  />
+</div>
