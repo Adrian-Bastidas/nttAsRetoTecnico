@@ -169,6 +169,44 @@
   border-radius: 50%;
 }
 
+.footer-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-btn {
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-btn i {
+  font-size: 12px;
+}
+
+.page-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.page-number {
+  min-width: 28px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
 @keyframes skeleton-loading {
   0% {
     background-color: #f0f0f0;

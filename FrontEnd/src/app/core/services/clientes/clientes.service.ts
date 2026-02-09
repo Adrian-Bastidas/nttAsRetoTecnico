@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { ShortPopUpService } from '../popup.service';
-import { Cliente } from '../../interfaces/clientes';
+import {
+  Cliente,
+  ClientePageResponse,
+  ClientePaginationResult,
+  PageResponse,
+} from '../../interfaces/clientes';
 import apiClient from '../../interceptors/axios.interceptor';
 import { BehaviorSubject } from 'rxjs';
 
@@ -9,13 +14,57 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class ClientesService {
   constructor(private popupService: ShortPopUpService) {}
+  async loadPaginatedClientes(
+    page: number,
+    size: number,
+  ): Promise<ClientePaginationResult> {
+    return this.handleRequest<ClientePaginationResult>({
+      request: () =>
+        apiClient.get<PageResponse<Cliente>>('/clientes/paginated', {
+          params: { page, size },
+        }),
 
-  async loadClientes(): Promise<Cliente[]> {
-    return this.handleRequest<Cliente[]>({
-      request: () => apiClient.get('/clientes'),
-      successData: (data) => data || [],
+      successData: (pageResponse) => ({
+        clientes: pageResponse.content ?? [],
+        totalElements: pageResponse.totalElements ?? 0,
+        totalPages: pageResponse.totalPages ?? 0,
+      }),
+
       errorMessage: 'Error al cargar los clientes',
-      fallback: [],
+      fallback: {
+        clientes: [],
+        totalElements: 0,
+        totalPages: 0,
+      },
+    });
+  }
+
+  async loadPaginatedClientesById(
+    identificacion: string,
+    page: number,
+    size: number,
+  ): Promise<ClientePaginationResult> {
+    return this.handleRequest<ClientePaginationResult>({
+      request: () =>
+        apiClient.get<PageResponse<Cliente>>(
+          `/clientes/paginated/${identificacion}`,
+          {
+            params: { page, size },
+          },
+        ),
+
+      successData: (pageResponse) => ({
+        clientes: pageResponse.content ?? [],
+        totalElements: pageResponse.totalElements ?? 0,
+        totalPages: pageResponse.totalPages ?? 0,
+      }),
+
+      errorMessage: 'Error al cargar los clientes',
+      fallback: {
+        clientes: [],
+        totalElements: 0,
+        totalPages: 0,
+      },
     });
   }
 

@@ -1,6 +1,8 @@
 package com.ntt.user_service.repository;
 
 import com.ntt.user_service.model.Cliente;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -10,4 +12,8 @@ public interface ClienteRepository extends JpaRepository<Cliente,Long> {
     boolean existsByIdentificacion(String identificacion);
     Optional<Cliente> findByClienteId(Long id);
     Optional<Cliente> findByIdentificacion(String identificacion);
+    Page<Cliente> findByIdentificacionContaining(
+            String identificacion,
+            Pageable pageable
+    );
 }

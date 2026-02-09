@@ -1,5 +1,12 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
-import { Component, HostListener, Input, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -15,12 +22,16 @@ import { ProductoInternalService } from 'src/app/core/services/products.service'
 export class TableConstructorComponent implements OnInit {
   @Input() columns: { key: string; label: string; tooltip?: string }[] = [];
   @Input() data: any[] = [];
+  @Input() currentPage: any = 0;
+  @Input() maxPage: any = 10;
   @Input() deleteFunction: (row: any) => void = () => {};
+  @Output() pageChange = new EventEmitter<number>();
+  @Output() pageSizeChange = new EventEmitter<{ size: number; page: number }>();
 
   constructor(
     private router: Router,
     private productoService: ProductoInternalService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
   ) {}
 
   selectedResults: number = 5;
@@ -67,5 +78,25 @@ export class TableConstructorComponent implements OnInit {
 
   deleteItem(row: any) {
     this.deleteFunction(row);
+  }
+
+  nextPage() {
+    if (this.currentPage < this.maxPage) {
+      this.currentPage++;
+      this.pageChange.emit(this.currentPage);
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.pageChange.emit(this.currentPage);
+    }
+  }
+  onPageSizeChange(): void {
+    this.pageSizeChange.emit({
+      size: this.selectedResults,
+      page: this.currentPage,
+    });
   }
 }

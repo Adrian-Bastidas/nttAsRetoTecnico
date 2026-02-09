@@ -4,6 +4,7 @@ import com.ntt.user_service.dtos.cliente.ClienteRequestDTO;
 import com.ntt.user_service.dtos.cliente.ClienteResponseVo;
 import com.ntt.user_service.service.ClienteService;
 import com.ntt.user_service.utils.ApiResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +35,32 @@ public class clienteController {
         List<ClienteResponseVo> clientes = clienteService.listClientes();
         return ResponseEntity.ok(ApiResponse.success(clientes));
     }
+
+    @GetMapping("/paginated")
+    public ResponseEntity<ApiResponse<Page<ClienteResponseVo>>> listPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
+
+        Page<ClienteResponseVo> clientes =
+                clienteService.pageClientes(page, size);
+
+        return ResponseEntity.ok(ApiResponse.success(clientes));
+    }
+
+    @GetMapping("/paginated/{identificacion}")
+    public ResponseEntity<ApiResponse<Page<ClienteResponseVo>>> pageClientesByIdentificacion(
+            @PathVariable String identificacion,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
+
+        Page<ClienteResponseVo> clientes =
+                clienteService.pageClientesByIdentificacion(identificacion,page, size);
+
+        return ResponseEntity.ok(ApiResponse.success(clientes));
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ClienteResponseVo>> get(

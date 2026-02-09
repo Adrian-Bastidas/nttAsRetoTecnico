@@ -11,6 +11,10 @@ import com.ntt.user_service.utils.ClienteIdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +72,38 @@ public class ClienteService {
                 .map(clienteMapper::entityToVo)
                 .collect(Collectors.toList());
     }
+
+    public Page<ClienteResponseVo> pageClientes(int page, int size) {
+
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 50);
+
+        Pageable pageable = PageRequest.of(
+                safePage,
+                safeSize,
+                Sort.by("clienteId").ascending()
+        );
+
+        logger.info("Consultando clientes paginados: page={}, size={}", safePage, safeSize);
+
+        Page<Cliente> clientesPage = clienteRepository.findAll(pageable);
+
+        if (clientesPage.isEmpty()) {
+            logger.info("No hay clientes para page={}, size={}", safePage, safeSize);
+            return Page.empty(pageable);
+        }
+
+        logger.info(
+                "Clientes obtenidos: page={}, size={}, elements={}, total={}",
+                clientesPage.getNumber(),
+                clientesPage.getSize(),
+                clientesPage.getNumberOfElements(),
+                clientesPage.getTotalElements()
+        );
+
+        return clientesPage.map(clienteMapper::entityToVo);
+    }
+
 
     public ClienteResponseVo updateCliente(Long id, ClienteRequestDTO dto) {
         logger.info("Iniciando actualización del cliente con ID: {}", id);
@@ -132,4 +168,51 @@ public class ClienteService {
         logger.debug("Cliente encontrado: ID {} - Identificación: {}", identificacion, cliente.getIdentificacion());
         return clienteMapper.entityToVo(cliente);
     }
+    public Page<ClienteResponseVo> pageClientesByIdentificacion(
+            String identificacion,
+            int page,
+            int size
+    ) {
+
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 50);
+
+        Pageable pageable = PageRequest.of(
+                safePage,
+                safeSize,
+                Sort.by("clienteId").ascending()
+        );
+
+        logger.info(
+                "Consultando clientes paginados por identificacion: {}, page={}, size={}",
+                identificacion,
+                safePage,
+                safeSize
+        );
+
+        Page<Cliente> clientesPage =
+                clienteRepository.findByIdentificacionContaining(identificacion, pageable);
+
+        if (clientesPage.isEmpty()) {
+            logger.info(
+                    "No se encontraron clientes con identificacion={} page={} size={}",
+                    identificacion,
+                    safePage,
+                    safeSize
+            );
+            return Page.empty(pageable);
+        }
+
+        logger.info(
+                "Clientes obtenidos: identificacion={}, page={}, size={}, elements={}, total={}",
+                identificacion,
+                clientesPage.getNumber(),
+                clientesPage.getSize(),
+                clientesPage.getNumberOfElements(),
+                clientesPage.getTotalElements()
+        );
+
+        return clientesPage.map(clienteMapper::entityToVo);
+    }
+
 }

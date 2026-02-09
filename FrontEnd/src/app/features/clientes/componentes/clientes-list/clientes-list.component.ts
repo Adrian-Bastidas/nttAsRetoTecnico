@@ -26,17 +26,43 @@ export class ClientesListComponent {
   showDeleteModal: boolean = false;
   selectedProduct: any = null;
   rows: Cliente[] = [];
+  currentPage: number = 1;
+  maxPage: number = 1;
+  pageSize: number = 5;
+  serachTerm: string = '';
 
   ngOnInit(): void {
     this.filteredRows = [...this.rows];
-    this.cargarProductos();
+    this.cargarClientes();
   }
 
-  searchChange(term: string) {
-    const lowerCaseTerm = term.toLowerCase();
-    this.filteredRows = this.rows.filter((Cliente) =>
-      Cliente.nombre.toLowerCase().includes(lowerCaseTerm),
-    );
+  async searchChange(term: string) {
+    this.Loader.show();
+    this.serachTerm = term;
+    if (term === '') {
+      this.cargarClientes();
+    } else {
+      this.currentPage = 1;
+      const response = await this.ClientesService.loadPaginatedClientesById(
+        term,
+        this.currentPage - 1,
+        this.pageSize,
+      );
+      this.filteredRows = response?.clientes;
+      this.rows = [...response?.clientes];
+      this.maxPage = response?.totalPages ?? 1;
+    }
+
+    this.Loader.hide();
+  }
+
+  onPageChange(newPage: number): void {
+    this.currentPage = newPage;
+    if (this.serachTerm !== '') {
+      this.searchChange(this.serachTerm);
+    } else {
+      this.cargarClientes();
+    }
   }
 
   goToAddProduct() {
@@ -44,11 +70,16 @@ export class ClientesListComponent {
   }
 
   clientes: Cliente[] = [];
-  async cargarProductos(): Promise<void> {
+  async cargarClientes(): Promise<void> {
     this.Loader.show();
-    const clientes = await this.ClientesService.loadClientes();
+    const response = await this.ClientesService.loadPaginatedClientes(
+      this.currentPage - 1,
+      this.pageSize,
+    );
+    const clientes = response?.clientes ?? [];
     this.rows = [...clientes];
     this.filteredRows = [...clientes];
+    this.maxPage = response?.totalPages ?? 1;
     this.Loader.hide();
   }
   columns = [
@@ -85,5 +116,14 @@ export class ClientesListComponent {
   deleteProduct(productId: any): void {
     this.showDeleteModal = false;
     this.selectedProduct = null;
+  }
+  onPageSizeChange(event: { size: number; page: number }): void {
+    this.pageSize = event.size;
+    this.currentPage = event.page;
+    if (this.serachTerm !== '') {
+      this.searchChange(this.serachTerm);
+    } else {
+      this.cargarClientes();
+    }
   }
 }

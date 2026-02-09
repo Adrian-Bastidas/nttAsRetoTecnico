@@ -9,10 +9,14 @@
     <app-table-constructor
       [columns]="columns"
       [data]="filteredRows"
+      [currentPage]="currentPage"
+      [maxPage]="maxPage"
       [deleteFunction]="openDeleteModal"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
     ></app-table-constructor>
   </div>
 </div>
 
-<app-delete-product (productoEliminado)="cargarProductos()">
+<app-delete-product (productoEliminado)="cargarClientes()">
 </app-delete-product>

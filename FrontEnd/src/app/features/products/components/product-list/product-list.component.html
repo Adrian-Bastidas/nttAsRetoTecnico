@@ -9,6 +9,8 @@
     <app-table-constructor
       [columns]="columns"
       [data]="filteredRows"
+      [currentPage]="2"
+      [maxPage]="10"
       [deleteFunction]="openDeleteModal"
     ></app-table-constructor>
   </div>
