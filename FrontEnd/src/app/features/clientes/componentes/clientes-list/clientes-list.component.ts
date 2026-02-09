@@ -7,6 +7,7 @@ import { ProductoInternalService } from 'src/app/core/services/products.service'
 import { DeleteProductComponent } from 'src/app/features/products/components/delete-product/delete-product.component';
 import { SearchComponent } from 'src/app/shared/components/search/search.component';
 import { TableConstructorComponent } from 'src/app/shared/components/table-constructor/table-constructor.component';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-clientes-list',
@@ -15,6 +16,7 @@ import { TableConstructorComponent } from 'src/app/shared/components/table-const
   styleUrl: './clientes-list.component.css',
 })
 export class ClientesListComponent {
+  private searchSubject = new Subject<string>();
   constructor(
     private ClientesService: ClientesService,
     private router: Router,
@@ -32,28 +34,45 @@ export class ClientesListComponent {
   serachTerm: string = '';
 
   ngOnInit(): void {
+    this.searchSubject
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe((term) => {
+        this.executeSearch(term);
+      });
     this.filteredRows = [...this.rows];
     this.cargarClientes();
   }
 
-  async searchChange(term: string) {
+  searchChange(term: string) {
+    this.searchSubject.next(term);
+  }
+
+  private async executeSearch(term: string) {
     this.Loader.show();
     this.serachTerm = term;
+
     if (term === '') {
-      this.cargarClientes();
+      this.currentPage = 1;
+      await this.cargarClientes();
     } else {
       this.currentPage = 1;
+
       const response = await this.ClientesService.loadPaginatedClientesById(
         term,
         this.currentPage - 1,
         this.pageSize,
       );
-      this.filteredRows = response?.clientes;
-      this.rows = [...response?.clientes];
+
+      this.filteredRows = response?.clientes ?? [];
+      this.rows = [...this.filteredRows];
       this.maxPage = response?.totalPages ?? 1;
     }
 
     this.Loader.hide();
+  }
+
+  ngOnDestroy() {
+    this.searchSubject.complete();
   }
 
   onPageChange(newPage: number): void {
