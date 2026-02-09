@@ -10,8 +10,8 @@ import {
 
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { GeneralService } from 'src/app/core/services/GeneralServices/general-services.service';
 import { LoaderService } from 'src/app/core/services/loader.service';
-import { ProductoInternalService } from 'src/app/core/services/products.service';
 
 @Component({
   selector: 'app-table-constructor',
@@ -24,13 +24,14 @@ export class TableConstructorComponent implements OnInit {
   @Input() data: any[] = [];
   @Input() currentPage: any = 0;
   @Input() maxPage: any = 10;
+  @Input() editRoute: String = '/';
   @Input() deleteFunction: (row: any) => void = () => {};
   @Output() pageChange = new EventEmitter<number>();
   @Output() pageSizeChange = new EventEmitter<{ size: number; page: number }>();
 
   constructor(
     private router: Router,
-    private productoService: ProductoInternalService,
+    private generalService: GeneralService,
     private loaderService: LoaderService,
   ) {}
 
@@ -72,8 +73,8 @@ export class TableConstructorComponent implements OnInit {
   }
 
   editItem(row: any) {
-    this.productoService.setProducto(row);
-    this.router.navigate(['/add']);
+    this.generalService.setObjecttoEdit(row);
+    this.router.navigate([this.editRoute]);
   }
 
   deleteItem(row: any) {

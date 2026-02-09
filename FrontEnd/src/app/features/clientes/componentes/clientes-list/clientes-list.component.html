@@ -2,7 +2,7 @@
   <div class="search-products">
     <div class="search-header">
       <app-search (searchChange)="searchChange($event)"></app-search>
-      <button class="add-button" (click)="goToAddProduct()">Agregar</button>
+      <button class="add-button" (click)="goToAddClient()">Agregar</button>
     </div>
   </div>
   <div class="product-list-container">
@@ -14,9 +14,10 @@
       [deleteFunction]="openDeleteModal"
       (pageChange)="onPageChange($event)"
       (pageSizeChange)="onPageSizeChange($event)"
+      [editRoute]="'/addClient'"
     ></app-table-constructor>
   </div>
 </div>
 
-<app-delete-product (productoEliminado)="cargarClientes()">
-</app-delete-product>
+<app-delete-constructor [title]="'cliente'" (deleteFunc)="deleteClient($event)">
+</app-delete-constructor>

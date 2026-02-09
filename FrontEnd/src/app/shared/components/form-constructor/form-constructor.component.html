@@ -1,0 +1,82 @@
+<div class="sizeCard">
+  <div class="create-form">
+    <div class="form-container">
+      <div class="back-button" *ngIf="showBackButton">
+        <div
+          class="btn-back"
+          (click)="goBack()"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="backButtonLabel"
+        >
+          <i class="fa fa-arrow-left" aria-hidden="true"></i>
+          {{ backButtonLabel }}
+        </div>
+      </div>
+
+      <h2>{{ title }}</h2>
+
+      <form
+        [formGroup]="formGroup"
+        (ngSubmit)="handleSubmit($event)"
+        novalidate
+      >
+        <div class="form-grid" [ngStyle]="getGridStyle()">
+          <div class="form-group" *ngFor="let field of fields">
+            <label [for]="field.name + '-input'">{{ field.label }}</label>
+
+            <select
+              *ngIf="field.type === 'select'"
+              [id]="field.name + '-input'"
+              [formControlName]="field.name"
+              [class.error]="isFieldInvalid(field.name)"
+            >
+              <option value="" disabled selected>
+                {{ field.placeholder || "Seleccione una opción" }}
+              </option>
+              <option
+                *ngFor="let option of field.options"
+                [value]="option.value"
+              >
+                {{ option.label }}
+              </option>
+            </select>
+
+            <input
+              *ngIf="field.type !== 'select'"
+              [id]="field.name + '-input'"
+              [formControlName]="field.name"
+              [type]="field.type || 'text'"
+              [attr.maxlength]="field.maxLength || null"
+              [placeholder]="field.placeholder || ''"
+              [readonly]="field.readonly || false"
+              [class.error]="isFieldInvalid(field.name)"
+              (input)="handleInput($event, field)"
+              (keydown)="handleKeydown($event, field)"
+            />
+
+            <div
+              *ngIf="isFieldInvalid(field.name)"
+              class="error-message"
+              role="alert"
+            >
+              {{ getErrorMessage(field) }}
+            </div>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button
+            *ngFor="let button of buttons"
+            [type]="button.type"
+            [class]="button.class || 'btn-default'"
+            [disabled]="isButtonDisabled(button)"
+            (click)="handleButtonClick(button, $event)"
+          >
+            {{ button.label }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

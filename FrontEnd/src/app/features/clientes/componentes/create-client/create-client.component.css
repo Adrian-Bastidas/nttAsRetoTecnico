@@ -28,7 +28,6 @@ h2 {
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 1.2rem;
 }
 
@@ -53,10 +52,29 @@ input {
   box-sizing: border-box;
 }
 
-input:disabled {
-  background-color: #f3f3f3;
+select {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 2px solid #999;
+  font-size: 0.95rem;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #fff;
+  cursor: pointer;
 }
 
+select option {
+  padding: 0.5rem;
+}
+
+select:disabled,
+input:disabled {
+  background-color: #f3f3f3;
+  cursor: not-allowed;
+}
+
+select.error,
 input.error {
   border-color: red;
 }
@@ -83,6 +101,11 @@ button {
   font-size: 0.95rem;
 }
 
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .btn-reset {
   background-color: #e2e8f0;
   color: var(--text);
@@ -90,6 +113,11 @@ button {
 
 .btn-submit {
   background-color: var(--primary-color);
+  color: var(--text);
+}
+
+.btn-default {
+  background-color: #e2e8f0;
   color: var(--text);
 }
 
@@ -133,7 +161,7 @@ button {
   }
 
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     gap: 1rem;
   }
 

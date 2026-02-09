@@ -17,6 +17,7 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 
@@ -303,6 +304,42 @@ public class CuentaService {
         CuentaResponseVo cuentaVO = cuentaMapper.entityToVO(cuenta);
         cuentaVO.setCliente(cliente);
         return cuentaVO;
+    }
+    public Page<CuentaResponseVo> obtenerAllCuentas(int page, int size) {
+        logger.info("Buscando cuentas paginadas...");
+
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 50);
+
+        Pageable pageable = PageRequest.of(
+                safePage,
+                safeSize,
+                Sort.by("cuentaId").ascending()
+        );
+
+        Page<Cuenta> cuentasPage = cuentaRepository.findAll(pageable);
+        logger.info("Consultando cuentas paginadas: page={}, size={}, elementos={}",
+                safePage, safeSize, cuentasPage.getNumberOfElements());
+
+        List<CuentaResponseVo> cuentasVOList = cuentasPage.stream().map(cuenta -> {
+            CuentaResponseVo vo = cuentaMapper.entityToVO(cuenta);
+            try {
+                ApiResponse<?> response = userServiceClient.obtenerCliente(cuenta.getClienteId());
+                ClienteVo cliente = objectMapper.convertValue(response.getData(), ClienteVo.class);
+                vo.setCliente(cliente);
+            } catch (Exception e) {
+                logger.warn("Error al obtener info cliente para cuenta ID {}: {}", cuenta.getCuentaId(), e.getMessage());
+                vo.setCliente(null);
+            }
+            return vo;
+        }).collect(Collectors.toList());
+
+        // Devolver un Page<CuentaResponseVo> usando PageImpl para conservar paginación
+        return new PageImpl<>(
+                cuentasVOList,
+                pageable,
+                cuentasPage.getTotalElements()
+        );
     }
 
 }

@@ -31,7 +31,6 @@ export function setupAxiosInterceptors() {
       return config;
     },
     (error) => {
-      debugger;
       loaderService.hide();
       console.error('❌ Error en request:', error);
       return Promise.reject(error);
@@ -40,12 +39,11 @@ export function setupAxiosInterceptors() {
 
   apiClient.interceptors.response.use(
     (response) => {
-      console.log('✅ Respuesta recibida:', response.status, response.data);
+      console.log('✅ Respuesta recibida:', response.status);
       loaderService.hide();
       return response;
     },
     (error) => {
-      debugger;
       loaderService.hide();
       console.error('⚠️ Error capturado en interceptor:', error);
       if (axios.isAxiosError(error)) {

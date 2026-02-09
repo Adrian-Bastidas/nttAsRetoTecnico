@@ -1,5 +1,6 @@
 package com.ntt.user_service.service;
 
+import com.ntt.user_service.dtos.cliente.ClienteCompleteResponseVo;
 import com.ntt.user_service.dtos.cliente.ClienteRequestDTO;
 import com.ntt.user_service.dtos.cliente.ClienteResponseVo;
 import com.ntt.user_service.exception.ResourceAlreadyExistException;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,7 +75,7 @@ public class ClienteService {
                 .collect(Collectors.toList());
     }
 
-    public Page<ClienteResponseVo> pageClientes(int page, int size) {
+    public Page<ClienteCompleteResponseVo> pageClientes(int page, int size) {
 
         int safePage = Math.max(page, 0);
         int safeSize = Math.min(Math.max(size, 1), 50);
@@ -101,14 +103,14 @@ public class ClienteService {
                 clientesPage.getTotalElements()
         );
 
-        return clientesPage.map(clienteMapper::entityToVo);
+        return clientesPage.map(clienteMapper::entityCompleteToVo);
     }
 
 
     public ClienteResponseVo updateCliente(Long id, ClienteRequestDTO dto) {
         logger.info("Iniciando actualización del cliente con ID: {}", id);
 
-        Cliente cliente = clienteRepository.findById(id)
+        Cliente cliente = clienteRepository.findByClienteId(id)
                 .orElseThrow(() -> {
                     logger.warn("Intento de actualizar cliente no encontrado con ID: {}", id);
                     return new ResourceNotFoundException("Cliente no encontrado con ID: " + id);
@@ -131,17 +133,23 @@ public class ClienteService {
     }
 
 
-    public void deleteCliente(Long id) {
-        logger.info("Iniciando eliminación del cliente con ID: {}", id);
+    public void deleteCliente(Long clienteId) {
+        logger.info("Iniciando eliminación del cliente con clienteId: {}", clienteId);
 
-        if (!clienteRepository.existsById(id)) {
-            logger.warn("Intento de eliminar cliente no encontrado con ID: {}", id);
-            throw new ResourceNotFoundException("Cliente no encontrado con ID: " + id);
+        Optional<Cliente> clienteOpt = clienteRepository.findByClienteId(clienteId);
+
+        if (clienteOpt.isEmpty()) {
+            logger.warn("Intento de eliminar cliente no encontrado con clienteId: {}", clienteId);
+            throw new ResourceNotFoundException("Cliente no encontrado con clienteId: " + clienteId);
         }
 
-        clienteRepository.deleteById(id);
-        logger.info("Cliente eliminado exitosamente con ID: {}", id);
+        Cliente cliente = clienteOpt.get();
+
+        clienteRepository.delete(cliente);
+
+        logger.info("Cliente eliminado exitosamente con clienteId: {}", clienteId);
     }
+
 
     public ClienteResponseVo getCliente(Long id) {
         logger.info("Consultando cliente con ID: {}", id);
@@ -168,7 +176,7 @@ public class ClienteService {
         logger.debug("Cliente encontrado: ID {} - Identificación: {}", identificacion, cliente.getIdentificacion());
         return clienteMapper.entityToVo(cliente);
     }
-    public Page<ClienteResponseVo> pageClientesByIdentificacion(
+    public Page<ClienteCompleteResponseVo> pageClientesByIdentificacion(
             String identificacion,
             int page,
             int size
@@ -212,7 +220,7 @@ public class ClienteService {
                 clientesPage.getTotalElements()
         );
 
-        return clientesPage.map(clienteMapper::entityToVo);
+        return clientesPage.map(clienteMapper::entityCompleteToVo);
     }
 
 }

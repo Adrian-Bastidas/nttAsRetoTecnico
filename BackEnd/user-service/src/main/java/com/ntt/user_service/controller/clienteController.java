@@ -1,5 +1,6 @@
 package com.ntt.user_service.controller;
 
+import com.ntt.user_service.dtos.cliente.ClienteCompleteResponseVo;
 import com.ntt.user_service.dtos.cliente.ClienteRequestDTO;
 import com.ntt.user_service.dtos.cliente.ClienteResponseVo;
 import com.ntt.user_service.service.ClienteService;
@@ -37,25 +38,25 @@ public class clienteController {
     }
 
     @GetMapping("/paginated")
-    public ResponseEntity<ApiResponse<Page<ClienteResponseVo>>> listPaginated(
+    public ResponseEntity<ApiResponse<Page<ClienteCompleteResponseVo>>> listPaginated(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size
     ) {
 
-        Page<ClienteResponseVo> clientes =
+        Page<ClienteCompleteResponseVo> clientes =
                 clienteService.pageClientes(page, size);
 
         return ResponseEntity.ok(ApiResponse.success(clientes));
     }
 
     @GetMapping("/paginated/{identificacion}")
-    public ResponseEntity<ApiResponse<Page<ClienteResponseVo>>> pageClientesByIdentificacion(
+    public ResponseEntity<ApiResponse<Page<ClienteCompleteResponseVo>>> pageClientesByIdentificacion(
             @PathVariable String identificacion,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size
     ) {
 
-        Page<ClienteResponseVo> clientes =
+        Page<ClienteCompleteResponseVo> clientes =
                 clienteService.pageClientesByIdentificacion(identificacion,page, size);
 
         return ResponseEntity.ok(ApiResponse.success(clientes));

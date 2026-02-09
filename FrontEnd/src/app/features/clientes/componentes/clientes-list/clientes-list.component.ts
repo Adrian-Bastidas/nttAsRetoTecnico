@@ -3,15 +3,19 @@ import { Router } from '@angular/router';
 import { Cliente } from 'src/app/core/interfaces/clientes';
 import { ClientesService } from 'src/app/core/services/clientes/clientes.service';
 import { LoaderService } from 'src/app/core/services/loader.service';
-import { ProductoInternalService } from 'src/app/core/services/products.service';
-import { DeleteProductComponent } from 'src/app/features/products/components/delete-product/delete-product.component';
 import { SearchComponent } from 'src/app/shared/components/search/search.component';
 import { TableConstructorComponent } from 'src/app/shared/components/table-constructor/table-constructor.component';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { GeneralService } from 'src/app/core/services/GeneralServices/general-services.service';
+import { DeleteConstructorComponent } from 'src/app/shared/components/delete-constructor/delete-constructor.component';
 
 @Component({
   selector: 'app-clientes-list',
-  imports: [TableConstructorComponent, SearchComponent, DeleteProductComponent],
+  imports: [
+    TableConstructorComponent,
+    SearchComponent,
+    DeleteConstructorComponent,
+  ],
   templateUrl: './clientes-list.component.html',
   styleUrl: './clientes-list.component.css',
 })
@@ -20,13 +24,13 @@ export class ClientesListComponent {
   constructor(
     private ClientesService: ClientesService,
     private router: Router,
-    private productoService: ProductoInternalService,
     private Loader: LoaderService,
+    private generalService: GeneralService,
   ) {}
   searchTerm: string = '';
   filteredRows: any[] = [];
   showDeleteModal: boolean = false;
-  selectedProduct: any = null;
+  selectedClient: any = null;
   rows: Cliente[] = [];
   currentPage: number = 1;
   maxPage: number = 1;
@@ -84,8 +88,8 @@ export class ClientesListComponent {
     }
   }
 
-  goToAddProduct() {
-    this.router.navigate(['/add']);
+  goToAddClient() {
+    this.router.navigate(['/addClient']);
   }
 
   clientes: Cliente[] = [];
@@ -102,13 +106,15 @@ export class ClientesListComponent {
     this.Loader.hide();
   }
   columns = [
-    { key: 'clienteId', label: 'Id de Cliente' },
-    { key: 'nombre', label: 'nombre' },
     {
       key: 'identificacion',
       label: 'Identificación',
       tooltip: 'Número de identificación del cliente',
     },
+
+    { key: 'nombre', label: 'nombre' },
+    { key: 'edad', label: 'Edad' },
+    { key: 'genero', label: 'Género' },
     {
       key: 'direccion',
       label: 'Dirección',
@@ -122,19 +128,22 @@ export class ClientesListComponent {
   ];
 
   openDeleteModal(Cliente: any): void {
-    this.productoService.setDelProducto(Cliente);
+    this.generalService.setDelObject(Cliente);
 
     this.showDeleteModal = true;
   }
 
   cancelDelete(): void {
     this.showDeleteModal = false;
-    this.selectedProduct = null;
+    this.selectedClient = null;
   }
 
-  deleteProduct(productId: any): void {
+  async deleteClient(id: any): Promise<void> {
+    await this.ClientesService.deleteClient(id);
+    this.generalService.clearDelObj();
     this.showDeleteModal = false;
-    this.selectedProduct = null;
+    this.selectedClient = null;
+    this.cargarClientes();
   }
   onPageSizeChange(event: { size: number; page: number }): void {
     this.pageSize = event.size;

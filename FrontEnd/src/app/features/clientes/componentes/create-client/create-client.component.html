@@ -1,0 +1,23 @@
+<app-form-constructor
+  [title]="'Formulario de Registro Cliente'"
+  [formGroup]="formulario"
+  [fields]="formFields"
+  [buttons]="formButtons"
+  [showBackButton]="true"
+  [backButtonLabel]="'Regresar'"
+  [gridColumns]="2"
+  (onSubmit)="enviar()"
+  (onBack)="goToList()"
+>
+</app-form-constructor>
+
+<app-short-pop-up
+  [show]="mostrarPopup"
+  [type]="
+    typeModal === 'success' || typeModal === 'error' ? typeModal : 'error'
+  "
+  [message]="message"
+  [showAcceptButton]="true"
+  (close)="mostrarPopup = false"
+>
+</app-short-pop-up>

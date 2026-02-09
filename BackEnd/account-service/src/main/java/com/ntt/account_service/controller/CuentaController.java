@@ -7,6 +7,7 @@ import com.ntt.account_service.service.CuentaService;
 import com.ntt.account_service.utils.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +47,15 @@ public class CuentaController {
             @PathVariable Long clienteId) {
 
         List<CuentaResponseVo> cuentas = cuentaService.obtenerCuentasPorCliente(clienteId);
+        return ResponseEntity.ok(ApiResponse.success(cuentas));
+    }
+
+    @GetMapping("/pageable")
+    public ResponseEntity<ApiResponse<Page<CuentaResponseVo>>> obtenerCuentas(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size ){
+
+        Page<CuentaResponseVo> cuentas = cuentaService.obtenerAllCuentas(page,size);
         return ResponseEntity.ok(ApiResponse.success(cuentas));
     }
 
