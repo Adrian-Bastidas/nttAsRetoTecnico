@@ -1,8 +1,5 @@
-server:
-  port: 8081
-
 spring:
   datasource:
-    url: jdbc:postgresql://host.docker.internal:5432/nttdb
+    url: jdbc:postgresql://localhost:5432/nttdb
     username: abastidas
     password: nttRodio

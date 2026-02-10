@@ -21,27 +21,28 @@
         (ngSubmit)="handleSubmit($event)"
         novalidate
       >
-        <div class="search-client-section" *ngIf="hasSearchClientField()">
+        <!-- ✅ Sección de búsqueda genérica -->
+        <div class="search-section" *ngIf="hasSearchField()">
           <div class="form-group">
-            <label for="client-search-input">Buscar Cliente</label>
+            <label [for]="searchConfig.fieldName + '-input'">{{
+              getSearchLabel()
+            }}</label>
             <div class="search-input-wrapper">
               <input
-                id="client-search-input"
+                [id]="searchConfig.fieldName + '-input'"
                 type="text"
-                [(ngModel)]="searchClientTerm"
+                [(ngModel)]="searchTerm"
                 [ngModelOptions]="{ standalone: true }"
-                [placeholder]="getSearchClientPlaceholder()"
-                [disabled]="isSearchClientDisabled()"
-                class="search-client-input"
+                [placeholder]="getSearchPlaceholder()"
+                [disabled]="isSearchDisabled()"
+                class="search-input"
               />
               <button
                 type="button"
-                class="btn-search-client"
-                (click)="handleSearchClient()"
+                class="btn-search"
+                (click)="handleSearch()"
                 [disabled]="
-                  !searchClientTerm ||
-                  searchClientTerm.trim() === '' ||
-                  isSearchClientDisabled()
+                  !searchTerm || searchTerm.trim() === '' || isSearchDisabled()
                 "
               >
                 <i class="fa fa-search" aria-hidden="true"></i>
@@ -50,10 +51,11 @@
             </div>
           </div>
 
-          <div class="client-info" *ngIf="clientData">
-            <h3>Información del Cliente</h3>
-            <div class="client-info-grid">
-              <div class="info-item" *ngFor="let item of getClientInfoFields()">
+          <!-- ✅ Mostrar datos de búsqueda de forma genérica -->
+          <div class="search-data-info" *ngIf="searchData">
+            <h3>Información</h3>
+            <div class="data-info-grid">
+              <div class="info-item" *ngFor="let item of getSearchDataFields()">
                 <span class="info-label">{{ item.label }}:</span>
                 <span class="info-value">{{ item.value }}</span>
               </div>
@@ -63,6 +65,7 @@
           <div class="divider"></div>
         </div>
 
+        <!-- ✅ Grid de campos del formulario -->
         <div class="form-grid" [ngStyle]="getGridStyle()">
           <div class="form-group" *ngFor="let field of getNonSearchFields()">
             <label [for]="field.name + '-input'">{{ field.label }}</label>
@@ -107,6 +110,7 @@
           </div>
         </div>
 
+        <!-- ✅ Botones -->
         <div class="buttons">
           <button
             *ngFor="let button of buttons"

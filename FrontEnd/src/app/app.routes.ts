@@ -4,6 +4,7 @@ import { CreateClientComponent } from './features/clientes/componentes/create-cl
 import { CuentasListComponent } from './features/cuentas/componentes/cuentas-list/cuentas-list.component';
 import { CreateCuentasComponent } from './features/cuentas/componentes/create-cuentas/create-cuentas.component';
 import { MovimientosListComponent } from './features/movimientos/componentes/movimientos-list/movimientos-list.component';
+import { CreateMovimientoComponent } from './features/movimientos/componentes/create-movimiento/create-movimiento.component';
 
 export const routes: Routes = [
   {
@@ -25,5 +26,9 @@ export const routes: Routes = [
   {
     path: 'movimientos',
     component: MovimientosListComponent,
+  },
+  {
+    path: 'addMovimiento',
+    component: CreateMovimientoComponent,
   },
 ];

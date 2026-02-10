@@ -107,6 +107,20 @@ export class CuentasService {
     });
   }
 
+  async loadCuentaByNumero(numeroCuenta: string): Promise<CuentaResponseVo> {
+    return this.handleRequest<CuentaResponseVo>({
+      request: () =>
+        apiClient.get<CuentaResponseVo>(
+          environment.API_BASE_URL_2 + `/cuentas/numero/${numeroCuenta}`,
+        ),
+
+      successData: (cuenta) => cuenta,
+
+      errorMessage: 'Error al cargar las cuentas',
+      fallback: {} as CuentaResponseVo,
+    });
+  }
+
   private async handleRequest<T>({
     request,
     onSuccess,

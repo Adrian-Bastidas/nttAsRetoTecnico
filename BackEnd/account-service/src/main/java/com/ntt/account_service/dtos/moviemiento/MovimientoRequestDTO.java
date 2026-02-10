@@ -1,29 +1,33 @@
 package com.ntt.account_service.dtos.moviemiento;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 
 import java.util.Date;
 
 public class MovimientoRequestDTO {
-    @NotNull(message = "NúmeroCuenta es requerido")
+
+    @NotBlank(message = "Número de cuenta es requerido")
     private String numeroCuenta;
 
-    @NotBlank(message = "Tipo de cuenta es requerido")
-    @Size(max = 50, message = "Tipo de cuenta no puede exceder 50 caracteres")
+    @NotNull(message = "Fecha es requerida")
     private Date fecha;
-    @NotBlank(message = "Valor es requerido")
+
+    @NotNull(message = "Valor es requerido")
+    @Positive(message = "Valor debe ser positivo")
     private Long valor;
 
-    @NotBlank(message = "Tipo es requerido")
+    @NotBlank(message = "Tipo de movimiento es requerido")
     private String tipo;
 
-    public String getTipo() {
-        return tipo;
+    public MovimientoRequestDTO() {
     }
 
-    public void setTipo(String tipo) {
+    public MovimientoRequestDTO(String numeroCuenta, Date fecha, Long valor, String tipo) {
+        this.numeroCuenta = numeroCuenta;
+        this.fecha = fecha;
+        this.valor = valor;
         this.tipo = tipo;
     }
 
@@ -49,5 +53,13 @@ public class MovimientoRequestDTO {
 
     public void setValor(Long valor) {
         this.valor = valor;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 }

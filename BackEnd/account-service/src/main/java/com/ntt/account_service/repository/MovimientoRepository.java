@@ -1,27 +1,37 @@
 package com.ntt.account_service.repository;
 
 import com.ntt.account_service.model.Movimiento;
-import feign.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
-    List<Movimiento> findByCuentaId(Long cuentaId);
 
-    Page<Movimiento> findByCuentaId(Long cuentaId, Pageable pageable);
 
-    @Query("SELECT COALESCE(SUM(m.valor), 0) FROM Movimiento m WHERE m.cuentaId = :cuentaId AND m.fecha < :fecha")
-    double obtenerSaldoAntesDeFecha(@Param("cuentaId") Long cuentaId, @Param("fecha") Date fecha);
+    @Query("SELECT m FROM Movimiento m WHERE m.cuenta.numeroCuenta = :numeroCuenta")
+    List<Movimiento> findByNumeroCuenta(@Param("numeroCuenta") String numeroCuenta);
 
-    List<Movimiento> findByCuentaIdAndFechaBetween(Long cuentaId, Date desde, Date hasta);
+    @Query("SELECT m FROM Movimiento m WHERE m.cuenta.numeroCuenta = :numeroCuenta")
+    Page<Movimiento> findByNumeroCuenta(@Param("numeroCuenta") String numeroCuenta, Pageable pageable);
 
-    List<Movimiento> findByCuentaIdAndFechaBetweenOrderByFechaAsc(Long cuentaId, Date desde, Date hasta);
-    Optional<Movimiento> findTopByCuentaIdOrderByFechaDesc(Long cuentaId);
-    
+
+    @Query("SELECT m FROM Movimiento m WHERE m.cuenta.cuentaId = :cuentaId AND m.fecha BETWEEN :desde AND :hasta ORDER BY m.fecha ASC")
+    List<Movimiento> findByCuentaIdAndFechaBetweenOrderByFechaAsc(
+            @Param("cuentaId") Long cuentaId,
+            @Param("desde") Date desde,
+            @Param("hasta") Date hasta);
+
+    @Query(value = "SELECT m FROM Movimiento m WHERE m.cuenta.cuentaId = :cuentaId ORDER BY m.fecha DESC LIMIT 1")
+    Optional<Movimiento> findTopByCuentaIdOrderByFechaDesc(@Param("cuentaId") Long cuentaId);
+
+    @Query(value = "SELECT m FROM Movimiento m WHERE m.cuenta.cuentaId = :cuentaId AND m.fecha < :fecha ORDER BY m.fecha DESC LIMIT 1")
+    Optional<Movimiento> findTopByCuentaIdAndFechaBeforeOrderByFechaDesc(
+            @Param("cuentaId") Long cuentaId,
+            @Param("fecha") Date fecha);
 }

@@ -1,38 +1,52 @@
 package com.ntt.account_service.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.util.Date;
 
 @Entity
+@Table(name = "movimiento")
 public class Movimiento {
+
     @Id
     @GeneratedValue(generator = "movimiento-id-generator")
     @GenericGenerator(
             name = "movimiento-id-generator",
             strategy = "com.ntt.account_service.utils.SafeRandomIdGenerator"
     )
+    @Column(name = "movimiento_id")
     private Long movimientoId;
-    private Long cuentaId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cuenta_id", nullable = false)
+    private Cuenta cuenta;
+
+    @Column(name = "fecha")
     private Date fecha;
+
+    @Column(name = "tipo_movimiento")
     private String tipoMovimiento;
+
+    @Column(name = "valor")
     private Long valor;
+
+    @Column(name = "saldo")
     private Long saldo;
+
 
     public Movimiento() {
     }
 
-    public Movimiento(Long movimientoId, Long cuentaId, Date fecha, String tipoMovimiento, Long valor, Long saldo) {
+    public Movimiento(Long movimientoId, Cuenta cuenta, Date fecha, String tipoMovimiento, Long valor, Long saldo) {
         this.movimientoId = movimientoId;
-        this.cuentaId = cuentaId;
+        this.cuenta = cuenta;
         this.fecha = fecha;
         this.tipoMovimiento = tipoMovimiento;
         this.valor = valor;
         this.saldo = saldo;
     }
+
 
     public Long getMovimientoId() {
         return movimientoId;
@@ -42,12 +56,12 @@ public class Movimiento {
         this.movimientoId = movimientoId;
     }
 
-    public Long getCuentaId() {
-        return cuentaId;
+    public Cuenta getCuenta() {
+        return cuenta;
     }
 
-    public void setCuentaId(Long cuentaId) {
-        this.cuentaId = cuentaId;
+    public void setCuenta(Cuenta cuenta) {
+        this.cuenta = cuenta;
     }
 
     public Date getFecha() {
@@ -80,5 +94,17 @@ public class Movimiento {
 
     public void setSaldo(Long saldo) {
         this.saldo = saldo;
+    }
+
+    @Override
+    public String toString() {
+        return "Movimiento{" +
+                "movimientoId=" + movimientoId +
+                ", cuentaId=" + (cuenta != null ? cuenta.getCuentaId() : null) +
+                ", fecha=" + fecha +
+                ", tipoMovimiento='" + tipoMovimiento + '\'' +
+                ", valor=" + valor +
+                ", saldo=" + saldo +
+                '}';
     }
 }

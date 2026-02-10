@@ -14,14 +14,14 @@
       [deleteFunction]="openDeleteModal"
       (pageChange)="onPageChange($event)"
       (pageSizeChange)="onPageSizeChange($event)"
-      [editRoute]="'/addCuenta'"
+      [editRoute]="'/addMovimiento'"
     ></app-table-constructor>
   </div>
 </div>
 
 <app-delete-constructor
   [title]="'la cuenta'"
-  (deleteFunc)="deleteClient($event)"
-  [delete]="'cuentaId'"
+  (deleteFunc)="deleteMovement($event)"
+  [delete]="'movimientoId'"
 >
 </app-delete-constructor>

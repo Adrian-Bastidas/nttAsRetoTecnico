@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ShortPopUpService } from '../popup.service';
 import {
+  MovimientoResponse,
   Movimientos,
   MovimientosPaginationResult,
 } from '../../interfaces/movimientos';
@@ -71,40 +72,44 @@ export class MovimientosService {
     });
   }
 
-  // async createCuentas(body: CreateCuenta): Promise<CuentaResponseVo> {
-  //   return this.handleRequest<CuentaResponseVo>({
-  //     request: () =>
-  //       apiClient.post(environment.API_BASE_URL_2 + '/cuentas', body),
-  //     onSuccess: () => this.popupService.showSuccess('Cuenta creada con éxito'),
-  //     errorMessage: 'Error al crear cuenta',
-  //     fallback: {} as CuentaResponseVo,
-  //   });
-  // }
+  async createMovimiento(body: MovimientoResponse): Promise<Movimientos> {
+    return this.handleRequest<Movimientos>({
+      request: () =>
+        apiClient.post(environment.API_BASE_URL_2 + '/movimientos', body),
+      onSuccess: () =>
+        this.popupService.showSuccess('Movimiento creado con éxito'),
+      errorMessage: 'Error al crear el movimiento',
+      fallback: {} as Movimientos,
+    });
+  }
 
-  // async editCuenta(id: string, body: CreateCuenta): Promise<CuentaResponseVo> {
-  //   return this.handleRequest<CuentaResponseVo>({
-  //     request: () =>
-  //       apiClient.put(environment.API_BASE_URL_2 + `/cuentas/${id}`, body),
-  //     onSuccess: () =>
-  //       this.popupService.showSuccess('Cuenta editada con éxito'),
-  //     errorMessage: 'Error al editar cuenta',
-  //     fallback: {} as CuentaResponseVo,
-  //   });
-  // }
+  async editMovimiento(
+    id: string,
+    body: MovimientoResponse,
+  ): Promise<MovimientoResponse> {
+    return this.handleRequest<MovimientoResponse>({
+      request: () =>
+        apiClient.put(environment.API_BASE_URL_2 + `/movimientos/${id}`, body),
+      onSuccess: () =>
+        this.popupService.showSuccess('Movimiento editado con éxito'),
+      errorMessage: 'Error al editar movimiento',
+      fallback: {} as MovimientoResponse,
+    });
+  }
 
-  // async deleteCuenta(id: string): Promise<string> {
-  //   return this.handleRequest<string>({
-  //     request: () =>
-  //       apiClient.delete(environment.API_BASE_URL_2 + `/cuentas/${id}`),
-  //     successData: (data) => {
-  //       const message = data?.message ?? 'Cuenta eliminada con éxito';
-  //       this.popupService.showSuccess(message);
-  //       return message;
-  //     },
-  //     errorMessage: 'Error al eliminar cuenta',
-  //     fallback: '',
-  //   });
-  // }
+  async deleteMovimiento(id: string): Promise<string> {
+    return this.handleRequest<string>({
+      request: () =>
+        apiClient.delete(environment.API_BASE_URL_2 + `/movimientos/${id}`),
+      successData: (data) => {
+        const message = data?.message ?? 'Movimiento eliminado con éxito';
+        this.popupService.showSuccess(message);
+        return message;
+      },
+      errorMessage: 'Error al eliminar movimiento',
+      fallback: '',
+    });
+  }
 
   private async handleRequest<T>({
     request,

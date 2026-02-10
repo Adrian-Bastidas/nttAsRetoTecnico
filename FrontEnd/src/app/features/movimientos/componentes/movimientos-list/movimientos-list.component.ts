@@ -1,9 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
-import { CuentaResponseVo } from 'src/app/core/interfaces/cuentas';
 import { Movimientos } from 'src/app/core/interfaces/movimientos';
-import { ClientesService } from 'src/app/core/services/clientes/clientes.service';
 import { CuentasService } from 'src/app/core/services/cuentas/cuentas.service';
 import { GeneralService } from 'src/app/core/services/GeneralServices/general-services.service';
 import { LoaderService } from 'src/app/core/services/loader.service';
@@ -25,7 +23,6 @@ import { TableConstructorComponent } from 'src/app/shared/components/table-const
 export class MovimientosListComponent {
   private searchSubject = new Subject<string>();
   constructor(
-    private CuentasService: CuentasService,
     private movimientosService: MovimientosService,
     private router: Router,
     private Loader: LoaderService,
@@ -34,7 +31,7 @@ export class MovimientosListComponent {
   searchTerm: string = '';
   filteredRows: any[] = [];
   showDeleteModal: boolean = false;
-  selectedClient: any = null;
+  selectedMovement: any = null;
   rows: Movimientos[] = [];
   currentPage: number = 1;
   maxPage: number = 1;
@@ -94,10 +91,10 @@ export class MovimientosListComponent {
   }
 
   goToAddCuenta() {
-    this.router.navigate(['/addCuenta']);
+    this.router.navigate(['/addMovimiento']);
   }
 
-  clientes: Movimientos[] = [];
+  movimientos: Movimientos[] = [];
   async cargarMovimientos(): Promise<void> {
     this.Loader.show();
     const response = await this.movimientosService.loadPaginatedCuentas(
@@ -122,22 +119,22 @@ export class MovimientosListComponent {
     { key: 'movimiento', label: 'Movimiento' },
   ];
 
-  openDeleteModal(Cuenta: any): void {
-    this.generalService.setDelObject(Cuenta);
+  openDeleteModal(movimiento: any): void {
+    this.generalService.setDelObject(movimiento);
 
     this.showDeleteModal = true;
   }
 
   cancelDelete(): void {
     this.showDeleteModal = false;
-    this.selectedClient = null;
+    this.selectedMovement = null;
   }
 
-  async deleteClient(id: any): Promise<void> {
-    await this.CuentasService.deleteCuenta(id);
+  async deleteMovement(id: any): Promise<void> {
+    await this.movimientosService.deleteMovimiento(id);
     this.generalService.clearDelObj();
     this.showDeleteModal = false;
-    this.selectedClient = null;
+    this.selectedMovement = null;
     this.cargarMovimientos();
   }
   onPageSizeChange(event: { size: number; page: number }): void {

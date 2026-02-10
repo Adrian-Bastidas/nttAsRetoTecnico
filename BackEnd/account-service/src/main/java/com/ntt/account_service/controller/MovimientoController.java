@@ -42,7 +42,7 @@ public class MovimientoController {
 
     @GetMapping("/cuenta/{numeroCuenta}")
     public ResponseEntity<ApiResponse<List<MovimeintoResponseVo>>> obtenerPorNumeroCuenta(
-            @PathVariable Long numeroCuenta) {
+            @PathVariable String numeroCuenta) {
 
         List<MovimeintoResponseVo> movimientos =
                 movimientoService.obtenerPorNumeroCuenta(numeroCuenta);
@@ -51,12 +51,12 @@ public class MovimientoController {
     }
     @GetMapping("/cuenta/paginate/{numeroCuenta}")
     public ResponseEntity<ApiResponse<Page<MovimeintoResponseVo>>> obtenerPorNumeroCuentaPaginados(
-            @PathVariable Long numeroCuenta,
+            @PathVariable String numeroCuenta,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
 
         Page<MovimeintoResponseVo> movimientos =
-                movimientoService.obtenerPorNumeroCuentaPage(numeroCuenta, page, size);
+                movimientoService.obtenerPorNumeroCuentaPaginado(numeroCuenta, page, size);
 
         return ResponseEntity.ok(ApiResponse.success(movimientos));
     }

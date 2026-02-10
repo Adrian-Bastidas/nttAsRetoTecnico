@@ -121,6 +121,34 @@ public class CuentaService {
         return cuentaVO;
     }
 
+    public CuentaResponseVo obtenerCuentaByMovimiento(String numerocuenta) {
+        logger.info("Buscando cuenta con número: {}", numerocuenta);
+        Cuenta cuenta = cuentaRepository.findByNumeroCuenta(numerocuenta)
+                .orElseThrow(() -> {
+                    logger.warn("Cuenta con número {} no encontrada", numerocuenta);
+                    return new CuentaNoEncontradaException("Cuenta no encontrada");
+                });
+
+        CuentaResponseVo cuentaVO = cuentaMapper.entityToVO(cuenta);
+
+        try {
+
+            ApiResponse<?> response = userServiceClient.obtenerCliente(cuenta.getClienteId());
+
+            ClienteVo cliente = objectMapper.convertValue(
+                    response.getData(),
+                    ClienteVo.class
+            );
+
+            cuentaVO.setCliente(cliente);
+            logger.info("Información de cliente agregada a cuenta número: {}", numerocuenta);
+        } catch (Exception e) {
+            logger.warn("Error al obtener información del cliente para cuenta {}: {}", numerocuenta, e.getMessage());
+        }
+
+        return cuentaVO;
+    }
+
     public List<CuentaResponseVo> obtenerCuentasPorCliente(Long clienteId) {
         logger.info("Buscando cuentas activas para cliente ID: {}", clienteId);
         try {

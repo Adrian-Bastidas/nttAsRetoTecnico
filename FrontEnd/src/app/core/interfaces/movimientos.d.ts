@@ -11,3 +11,10 @@ interface Movimientos {
   estado: boolean;
   movimiento: string;
 }
+
+interface MovimientoResponse {
+  numeroCuenta: string;
+  fecha: string;
+  valor: number;
+  tipo: string;
+}

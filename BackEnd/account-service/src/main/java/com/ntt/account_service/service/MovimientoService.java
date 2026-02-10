@@ -33,6 +33,7 @@ public class MovimientoService {
 
     @Autowired
     private MovimientoRepository movimientoRepository;
+
     @Autowired
     private CuentaRepository cuentaRepository;
 
@@ -44,16 +45,20 @@ public class MovimientoService {
     public MovimeintoResponseVo crearMovimiento(MovimientoRequestDTO dto) {
         logger.info("Iniciando creación de movimiento para cuenta: {}", dto.getNumeroCuenta());
 
-        // Buscar cuenta
+        // Buscar cuenta por número de cuenta
         Cuenta cuenta = cuentaRepository.findByNumeroCuenta(dto.getNumeroCuenta())
                 .orElseThrow(() ->
                         new CuentaNoEncontradaException("Cuenta no encontrada con número: " + dto.getNumeroCuenta())
                 );
-if(!Objects.equals(cuenta.getTipoCuenta(), dto.getTipo())){
-    logger.warn("El tipo de cuenta registrato no coincide con la del movimiento: {}", dto.getTipo());
-    throw new DiferentesTiposException("Se está tratando de realizar un movimiento de tipo "+dto.getTipo()+" en una cuenta de tipo " + cuenta.getTipoCuenta());
-}
-        // Obtener saldo actual real
+
+        // Validar que el tipo de movimiento coincida con el tipo de cuenta
+        if (!Objects.equals(cuenta.getTipoCuenta(), dto.getTipo())) {
+            logger.warn("El tipo de cuenta registrado no coincide con la del movimiento: {}", dto.getTipo());
+            throw new DiferentesTiposException("Se está tratando de realizar un movimiento de tipo " +
+                    dto.getTipo() + " en una cuenta de tipo " + cuenta.getTipoCuenta());
+        }
+
+        // Obtener saldo actual real - último movimiento de esta cuenta
         Long saldoActual = movimientoRepository
                 .findTopByCuentaIdOrderByFechaDesc(cuenta.getCuentaId())
                 .map(Movimiento::getSaldo)
@@ -63,30 +68,29 @@ if(!Objects.equals(cuenta.getTipoCuenta(), dto.getTipo())){
         Long nuevoSaldo = saldoActual + dto.getValor();
 
         if (nuevoSaldo < 0) {
+            logger.warn("Saldo insuficiente. Saldo actual: {}, Movimiento solicitado: {}", saldoActual, dto.getValor());
             throw new SaldoInsuficiente("Saldo insuficiente para realizar el movimiento");
         }
 
         // Crear movimiento
         Movimiento movimiento = MovimientoMapper.toEntity(dto);
-        movimiento.setCuentaId(cuenta.getCuentaId());
+        movimiento.setCuenta(cuenta);
         movimiento.setSaldo(nuevoSaldo);
         movimiento.setFecha(new Date());
 
         Movimiento guardado = movimientoRepository.save(movimiento);
 
-        logger.info("Movimiento guardado con ID {}", guardado.getMovimientoId());
+        logger.info("Movimiento guardado con ID {} para cuenta {}", guardado.getMovimientoId(), cuenta.getNumeroCuenta());
         logger.info("Nuevo saldo de la cuenta: {}", nuevoSaldo);
 
         return MovimientoMapper.toVo(guardado);
     }
 
-
-
-    public List<MovimeintoResponseVo> obtenerPorNumeroCuenta(Long numeroCuenta) {
+    public List<MovimeintoResponseVo> obtenerPorNumeroCuenta(String numeroCuenta) {
         logger.info("Buscando movimientos para número de cuenta: {}", numeroCuenta);
 
         try {
-            List<Movimiento> movimientos = movimientoRepository.findByCuentaId(numeroCuenta);
+            List<Movimiento> movimientos = movimientoRepository.findByNumeroCuenta(numeroCuenta);
 
             if (movimientos.isEmpty()) {
                 logger.warn("No se encontraron movimientos para la cuenta: {}", numeroCuenta);
@@ -103,8 +107,8 @@ if(!Objects.equals(cuenta.getTipoCuenta(), dto.getTipo())){
         }
     }
 
-    public Page<MovimeintoResponseVo> obtenerPorNumeroCuentaPage(Long numeroCuenta, int page, int size) {
-        logger.info("Buscando movimientos para número de cuenta: {}", numeroCuenta);
+    public Page<MovimeintoResponseVo> obtenerPorNumeroCuentaPaginado(String numeroCuenta, int page, int size) {
+        logger.info("Buscando movimientos paginados para número de cuenta: {}", numeroCuenta);
 
         int safePage = Math.max(page, 0);
         int safeSize = Math.min(Math.max(size, 1), 50);
@@ -115,25 +119,19 @@ if(!Objects.equals(cuenta.getTipoCuenta(), dto.getTipo())){
                     safeSize,
                     Sort.by("movimientoId").ascending()
             );
-            logger.info("Consultando clientes paginados: page={}, size={}", safePage, safeSize);
 
-            Page<Movimiento> movimientos = movimientoRepository.findByCuentaId(numeroCuenta, pageable);
+            logger.info("Consultando movimientos paginados: page={}, size={}", safePage, safeSize);
 
-            if (movimientos.isEmpty()) {
-                logger.warn("No se encontraron movimientos para la cuenta: {}", numeroCuenta);
-                throw new MovimientoNoEncontradoException("No hay movimientos registrados para esta cuenta");
-            }
+            Page<Movimiento> movimientos = movimientoRepository.findByNumeroCuenta(numeroCuenta, pageable);
 
             if (movimientos.isEmpty()) {
-                logger.info(
-                        "No se encontraron movimientos con cuenta={} page={} size={}",
-                        numeroCuenta,
-                        safePage,
-                        safeSize
-                );
+                logger.info("No se encontraron movimientos para cuenta={} page={} size={}",
+                        numeroCuenta, safePage, safeSize);
                 return Page.empty(pageable);
             }
+
             return movimientos.map(MovimientoMapper::toVo);
+
         } catch (Exception e) {
             logger.error("Error al obtener movimientos por cuenta: {}", e.getMessage(), e);
             throw e;
@@ -159,23 +157,26 @@ if(!Objects.equals(cuenta.getTipoCuenta(), dto.getTipo())){
     }
 
     public Page<MovimeintoResponseVo> obtenerTodosPaginado(int page, int size) {
-        logger.info("Obteniendo todos los movimientos");
+        logger.info("Obteniendo todos los movimientos paginado");
+
         int safePage = Math.max(page, 0);
         int safeSize = Math.min(Math.max(size, 1), 50);
+
         try {
             Pageable pageable = PageRequest.of(
                     safePage,
                     safeSize,
                     Sort.by("movimientoId").ascending()
             );
-            logger.info("Consultando clientes paginados: page={}, size={}", safePage, safeSize);
+
+            logger.info("Consultando movimientos paginados: page={}, size={}", safePage, safeSize);
 
             Page<Movimiento> movimientos = movimientoRepository.findAll(pageable);
+
             if (movimientos.isEmpty()) {
-                logger.info("No hay clientes para page={}, size={}", safePage, safeSize);
+                logger.info("No hay movimientos para page={}, size={}", safePage, safeSize);
                 return Page.empty(pageable);
             }
-
 
             return movimientos.map(MovimientoMapper::toVo);
 
@@ -203,6 +204,7 @@ if(!Objects.equals(cuenta.getTipoCuenta(), dto.getTipo())){
             throw e;
         }
     }
+
     @Transactional
     public MovimeintoResponseVo actualizarMovimiento(Long id, MovimientoRequestDTO dto) {
         logger.info("Actualizando movimiento con ID: {}", id);
@@ -216,29 +218,37 @@ if(!Objects.equals(cuenta.getTipoCuenta(), dto.getTipo())){
         Cuenta cuenta = cuentaRepository.findByNumeroCuenta(dto.getNumeroCuenta())
                 .orElseThrow(() -> new CuentaNoEncontradaException("Cuenta no encontrada con número: " + dto.getNumeroCuenta()));
 
+        // Validar que el tipo de movimiento coincida con el tipo de cuenta
+        if (!Objects.equals(cuenta.getTipoCuenta(), dto.getTipo())) {
+            logger.warn("El tipo de cuenta no coincide con el tipo de movimiento: {}", dto.getTipo());
+            throw new DiferentesTiposException("Se está tratando de realizar un movimiento de tipo " +
+                    dto.getTipo() + " en una cuenta de tipo " + cuenta.getTipoCuenta());
+        }
 
-        Long saldoActual = cuenta.getSaldoInicial() != null ? cuenta.getSaldoInicial() : 0L;
-        Long saldoSinMovimientoViejo = saldoActual - movimiento.getValor();
-        Long nuevoSaldo = saldoSinMovimientoViejo + dto.getValor();
+        // Obtener el saldo base: último movimiento ANTERIOR a este
+        Long saldoBase = movimientoRepository
+                .findTopByCuentaIdAndFechaBeforeOrderByFechaDesc(cuenta.getCuentaId(), movimiento.getFecha())
+                .map(Movimiento::getSaldo)
+                .orElse(cuenta.getSaldoInicial());
+
+        // Calcular nuevo saldo con el valor actualizado
+        Long nuevoSaldo = saldoBase + dto.getValor();
 
         if (nuevoSaldo < 0) {
+            logger.warn("Saldo insuficiente para actualizar movimiento. Nuevo saldo sería: {}", nuevoSaldo);
             throw new SaldoInsuficiente("Saldo insuficiente para realizar el movimiento actualizado");
         }
 
-        // Actualizar campos del movimiento
         movimiento.setValor(dto.getValor());
         movimiento.setTipoMovimiento(dto.getTipo());
         movimiento.setFecha(dto.getFecha() != null ? dto.getFecha() : movimiento.getFecha());
         movimiento.setSaldo(nuevoSaldo);
-        movimiento.setCuentaId(cuenta.getCuentaId());
 
-        movimiento = movimientoRepository.save(movimiento);
+        Movimiento actualizado = movimientoRepository.save(movimiento);
 
-        cuenta.setSaldoInicial(nuevoSaldo);
-        cuentaRepository.save(cuenta);
+        logger.info("Movimiento actualizado correctamente con ID: {}", actualizado.getMovimientoId());
+        logger.info("Nuevo saldo del movimiento: {}", nuevoSaldo);
 
-        logger.info("Movimiento actualizado correctamente con ID: {}", movimiento.getMovimientoId());
-
-        return MovimientoMapper.toVo(movimiento);
+        return MovimientoMapper.toVo(actualizado);
     }
 }

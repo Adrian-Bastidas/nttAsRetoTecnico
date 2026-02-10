@@ -34,3 +34,16 @@ export interface FormButton {
   action?: () => void;
   disabled?: boolean;
 }
+
+export interface SearchConfig<T = any> {
+  enabled: boolean;
+  label?: string;
+  placeholder?: string;
+  disabled?: boolean;
+  buttonLabel?: string;
+
+  resultTitle?: string;
+  resultFields?: { label: string; key: string }[];
+
+  onSearch: (term: string) => void;
+}

@@ -3,6 +3,15 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FormButton, FormField } from 'src/app/core/interfaces/form';
 
+export interface SearchConfig {
+  enabled: boolean;
+  fieldName: string;
+  label: string;
+  placeholder: string;
+  readonly?: boolean;
+  infoFields?: { label: string; key: string }[];
+}
+
 @Component({
   selector: 'app-form-constructor',
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
@@ -18,13 +27,20 @@ export class FormConstructorComponent implements OnInit {
   @Input() backButtonLabel: string = 'Regresar';
   @Input() gridColumns: number = 2;
 
-  @Input() clientInfoFields: { label: string; key: string }[] = [];
-  @Output() onSearchClient = new EventEmitter<string>();
+  // ✅ Nueva interfaz genérica para búsqueda
+  @Input() searchConfig: SearchConfig = {
+    enabled: false,
+    fieldName: 'search',
+    label: 'Buscar',
+    placeholder: 'Ingrese el criterio de búsqueda',
+  };
+
+  @Output() onSearch = new EventEmitter<string>();
   @Output() onSubmit = new EventEmitter<void>();
   @Output() onBack = new EventEmitter<void>();
 
-  searchClientTerm: string = '';
-  clientData: any = null;
+  searchTerm: string = '';
+  searchData: any = null;
 
   ngOnInit(): void {
     if (!this.formGroup) {
@@ -36,46 +52,52 @@ export class FormConstructorComponent implements OnInit {
     return this.formGroup.controls;
   }
 
-  hasSearchClientField(): boolean {
-    return this.fields.some((field) => field.isSearchClient === true);
+  // ✅ Métodos genéricos para búsqueda
+  hasSearchField(): boolean {
+    return this.searchConfig.enabled;
   }
 
-  getSearchClientPlaceholder(): string {
-    const searchField = this.fields.find(
-      (field) => field.isSearchClient === true,
-    );
-    return (
-      searchField?.searchPlaceholder || 'Ingrese identificación del cliente'
-    );
+  getSearchLabel(): string {
+    return this.searchConfig.label;
+  }
+
+  getSearchPlaceholder(): string {
+    return this.searchConfig.placeholder;
+  }
+
+  isSearchDisabled(): boolean {
+    return this.searchConfig.readonly || false;
   }
 
   getNonSearchFields(): FormField[] {
-    return this.fields.filter((field) => !field.isSearchClient);
+    return this.fields;
   }
 
-  handleSearchClient(): void {
-    if (this.searchClientTerm && this.searchClientTerm.trim() !== '') {
-      this.onSearchClient.emit(this.searchClientTerm.trim());
+  handleSearch(): void {
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      this.onSearch.emit(this.searchTerm.trim());
     }
   }
 
-  setClientData(data: any): void {
-    this.clientData = data;
+  // ✅ Métodos genéricos para datos
+  setSearchData(data: any): void {
+    this.searchData = data;
   }
 
-  clearClientData(): void {
-    this.clientData = null;
-    this.searchClientTerm = '';
+  clearSearchData(): void {
+    this.searchData = null;
+    this.searchTerm = '';
   }
 
-  getClientInfoFields(): { label: string; value: any }[] {
-    if (!this.clientData || !this.clientInfoFields.length) return [];
+  getSearchDataFields(): { label: string; value: any }[] {
+    if (!this.searchData || !this.searchConfig.infoFields?.length) return [];
 
-    return this.clientInfoFields.map((field) => ({
+    return this.searchConfig.infoFields.map((field) => ({
       label: field.label,
-      value: this.getNestedProperty(this.clientData, field.key) || 'N/A',
+      value: this.getNestedProperty(this.searchData, field.key) || 'N/A',
     }));
   }
+
   private getNestedProperty(obj: any, path: string): any {
     return path.split('.').reduce((acc, part) => acc && acc[part], obj);
   }
@@ -135,11 +157,5 @@ export class FormConstructorComponent implements OnInit {
     return {
       'grid-template-columns': `repeat(${this.gridColumns}, 1fr)`,
     };
-  }
-  isSearchClientDisabled(): boolean {
-    const searchField = this.fields.find(
-      (field) => field.isSearchClient === true,
-    );
-    return searchField?.readonly || false;
   }
 }

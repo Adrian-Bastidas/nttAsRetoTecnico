@@ -37,7 +37,7 @@ public class SafeRandomIdGenerator implements IdentifierGenerator {
                 case "Movimiento":
                     generatedId = 100000L + random.nextLong(900000L);
                     Query<Long> movimientoQuery = session.createQuery(
-                            "SELECT COUNT(c.cuentaId) FROM Movimiento c WHERE c.movimientoId = :id",
+                            "SELECT COUNT(m) FROM Movimiento m WHERE m.movimientoId = :id",
                             Long.class
                     );
                     movimientoQuery.setParameter("id", generatedId);

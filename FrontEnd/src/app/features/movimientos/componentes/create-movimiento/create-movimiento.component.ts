@@ -8,9 +8,9 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FormButton, FormField } from 'src/app/core/interfaces/form';
-import { ClientesService } from 'src/app/core/services/clientes/clientes.service';
 import { CuentasService } from 'src/app/core/services/cuentas/cuentas.service';
 import { GeneralService } from 'src/app/core/services/GeneralServices/general-services.service';
+import { MovimientosService } from 'src/app/core/services/movimientos/movimientos.service';
 import {
   FormConstructorComponent,
   SearchConfig,
@@ -18,17 +18,17 @@ import {
 import { ShortPopUpComponent } from 'src/app/shared/components/short-pop-up/short-pop-up.component';
 
 @Component({
-  selector: 'app-create-cuentas',
+  selector: 'app-create-movimiento',
   imports: [
     CommonModule,
     ReactiveFormsModule,
     ShortPopUpComponent,
     FormConstructorComponent,
   ],
-  templateUrl: './create-cuentas.component.html',
-  styleUrl: './create-cuentas.component.css',
+  templateUrl: './create-movimiento.component.html',
+  styleUrl: './create-movimiento.component.css',
 })
-export class CreateCuentasComponent implements OnInit {
+export class CreateMovimientoComponent implements OnInit {
   @ViewChild(FormConstructorComponent)
   formConstructor!: FormConstructorComponent;
 
@@ -37,14 +37,12 @@ export class CreateCuentasComponent implements OnInit {
   formButtons: FormButton[] = [];
   searchConfig: SearchConfig = {
     enabled: false,
-    fieldName: 'clientSearch',
-    label: 'Buscar Cliente',
-    placeholder: 'Ingrese la identificación del cliente',
+    fieldName: 'accountSearch',
+    label: 'Buscar Cuenta',
+    placeholder: 'Ingrese el número de la cuenta',
     infoFields: [
-      { label: 'Nombre', key: 'nombre' },
-      { label: 'Identificación', key: 'identificacion' },
-      { label: 'Dirección', key: 'direccion' },
-      { label: 'Teléfono', key: 'telefono' },
+      { label: 'Tipo de Cuenta', key: 'tipoCuenta' },
+      { label: 'Cliente', key: 'cliente.nombre' },
     ],
   };
 
@@ -55,42 +53,30 @@ export class CreateCuentasComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private clientService: ClientesService,
+    private movimientosService: MovimientosService,
     private cuentasService: CuentasService,
     private router: Router,
     private generalService: GeneralService,
   ) {
     this.formulario = this.fb.group({
-      tipoCuenta: ['', [Validators.required]],
-      saldoInicial: ['', [Validators.required, Validators.min(0)]],
+      valor: ['', [Validators.required]],
     });
   }
 
   ngOnInit() {
     this.initializeFormFields();
     this.initializeFormButtons();
-    this.loadCuentaData();
+    this.loadMovimientoData();
   }
 
   private initializeFormFields(): void {
     this.formFields = [
       {
-        name: 'tipoCuenta',
-        label: 'Tipo de Cuenta',
-        type: 'select',
-        placeholder: 'Seleccione el tipo de cuenta',
-        errorMessage: 'El tipo de cuenta es requerido!',
-        options: [
-          { value: 'Ahorros', label: 'Ahorros' },
-          { value: 'Corriente', label: 'Corriente' },
-        ],
-      },
-      {
-        name: 'saldoInicial',
-        label: 'Saldo Inicial',
+        name: 'valor',
+        label: 'Valor',
         type: 'number',
         placeholder: '0.00',
-        errorMessage: 'El saldo inicial es requerido!',
+        errorMessage: 'El valor es requerido!',
       },
     ];
 
@@ -118,19 +104,20 @@ export class CreateCuentasComponent implements OnInit {
     ];
   }
 
-  private async loadCuentaData(): Promise<void> {
-    const cuenta = this.generalService.getObject();
+  private async loadMovimientoData(): Promise<void> {
+    const movimiento = this.generalService.getObject();
 
-    if (cuenta && cuenta.cuentaId) {
+    if (movimiento && movimiento.movimientoId) {
       this.isEdit = true;
+
       this.formulario.patchValue({
-        tipoCuenta: cuenta.tipoCuenta,
-        saldoInicial: cuenta.saldoInicial,
+        tipoCuenta: movimiento.tipoCuenta,
+        valor: this.extraerValor(movimiento.movimiento),
       });
 
-      if (cuenta.cliente && cuenta.cliente.identificacion) {
+      if (movimiento.movimientoId) {
         setTimeout(async () => {
-          await this.onSearch(cuenta.cliente.identificacion);
+          await this.onSearch(movimiento.numeroCuenta);
 
           this.initializeFormFields();
           this.initializeFormButtons();
@@ -138,31 +125,34 @@ export class CreateCuentasComponent implements OnInit {
       }
     }
   }
-
+  extraerValor(movimiento: string): number {
+    const esRetiro = movimiento.toLowerCase().includes('retiro');
+    const valor = parseInt(movimiento.match(/\d+/)?.[0] || '0', 10);
+    return esRetiro ? -valor : valor;
+  }
   async onSearch(searchTerm: string): Promise<void> {
     try {
-      const response = await this.clientService.loadClientesById(searchTerm);
+      const response = await this.cuentasService.loadCuentaByNumero(searchTerm);
 
-      if (response && response.clienteId) {
+      if (response && response.cuentaId) {
         this.formConstructor.setSearchData(response);
 
         if (!this.isEdit) {
-          this.showSuccess('Cliente encontrado correctamente');
+          this.showSuccess('Cuenta encontrada correctamente');
         }
       } else {
-        this.showError('No se encontró ningún cliente con esa identificación');
+        this.showError('No se encontró ninguna cuenta con ese número');
         this.formConstructor.clearSearchData();
       }
     } catch (error) {
-      console.error('Error buscando cliente:', error);
-      this.showError('Error al buscar el cliente');
+      console.error('Error buscando cuenta:', error);
       this.formConstructor.clearSearchData();
     }
   }
 
   reiniciar(): void {
     if (this.isEdit) {
-      this.loadCuentaData();
+      this.loadMovimientoData();
     } else {
       this.formulario.reset();
       if (this.formConstructor) {
@@ -175,7 +165,7 @@ export class CreateCuentasComponent implements OnInit {
     if (this.formulario.valid) {
       if (!this.formConstructor.searchData) {
         this.showError(
-          'Debe buscar y seleccionar un cliente antes de crear la cuenta',
+          'Debe buscar y seleccionar una cuenta antes de crear el movimiento',
         );
         return;
       }
@@ -188,31 +178,30 @@ export class CreateCuentasComponent implements OnInit {
 
   private async submitForm(): Promise<void> {
     const formularioValues = this.formulario.getRawValue();
-    const clienteData = this.formConstructor.searchData;
+    const movimientoDataFromSearch = this.formConstructor.searchData;
 
-    const cuentaData = {
-      tipoCuenta: formularioValues.tipoCuenta,
-      saldoInicial: Number(formularioValues.saldoInicial),
-      clienteId: clienteData.clienteId,
+    const movimientoData = {
+      tipo: movimientoDataFromSearch.tipoCuenta,
+      fecha: new Date().toISOString(),
+      valor: Number(formularioValues.valor),
+      numeroCuenta: movimientoDataFromSearch.numeroCuenta,
     };
 
     try {
       if (this.isEdit) {
-        const cuenta = this.generalService.getObject();
-        const response = await this.cuentasService.editCuenta(
-          cuenta.cuentaId,
-          cuentaData,
+        const movement = this.generalService.getObject();
+        const response = await this.movimientosService.editMovimiento(
+          movement.movimientoId,
+          movimientoData,
         );
         if (response && Object.keys(response).length !== 0) {
-          this.showSuccess('Cuenta actualizada correctamente');
           this.generalService.clearObject();
           setTimeout(() => {
             this.goToList();
           }, 1500);
         }
       } else {
-        await this.cuentasService.createCuentas(cuentaData);
-        this.showSuccess('Cuenta creada correctamente');
+        await this.movimientosService.createMovimiento(movimientoData);
         this.formulario.reset();
         if (this.formConstructor) {
           this.formConstructor.clearSearchData();
@@ -220,12 +209,11 @@ export class CreateCuentasComponent implements OnInit {
       }
     } catch (error) {
       console.error('Error al enviar formulario:', error);
-      this.showError('Error al procesar la solicitud');
     }
   }
 
   goToList(): void {
-    this.router.navigate(['/cuentas']);
+    this.router.navigate(['/movimientos']);
   }
 
   private showError(message: string): void {

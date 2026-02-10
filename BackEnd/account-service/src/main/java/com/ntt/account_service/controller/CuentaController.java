@@ -119,4 +119,12 @@ public class CuentaController {
         );
     }
 
+    @GetMapping("/numero/{numerocuenta}")
+    public ResponseEntity<ApiResponse<CuentaResponseVo>> obtenerCuentaBynumero(
+            @PathVariable String numerocuenta) {
+
+        CuentaResponseVo cuenta = cuentaService.obtenerCuentaByMovimiento(numerocuenta);
+        return ResponseEntity.ok(ApiResponse.success(cuenta));
+    }
+
 }
