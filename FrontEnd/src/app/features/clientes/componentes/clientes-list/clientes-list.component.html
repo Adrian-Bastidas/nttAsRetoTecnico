@@ -19,5 +19,9 @@
   </div>
 </div>
 
-<app-delete-constructor [title]="'cliente'" (deleteFunc)="deleteClient($event)">
+<app-delete-constructor
+  [title]="'el cliente'"
+  (deleteFunc)="deleteClient($event)"
+  [delete]="'clienteId'"
+>
 </app-delete-constructor>

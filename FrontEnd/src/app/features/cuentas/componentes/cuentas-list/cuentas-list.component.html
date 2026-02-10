@@ -2,19 +2,26 @@
   <div class="search-products">
     <div class="search-header">
       <app-search (searchChange)="searchChange($event)"></app-search>
-      <button class="add-button" (click)="goToAddProduct()">Agregar</button>
+      <button class="add-button" (click)="goToAddCuenta()">Agregar</button>
     </div>
   </div>
   <div class="product-list-container">
     <app-table-constructor
       [columns]="columns"
       [data]="filteredRows"
-      [currentPage]="2"
-      [maxPage]="10"
+      [currentPage]="currentPage"
+      [maxPage]="maxPage"
       [deleteFunction]="openDeleteModal"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+      [editRoute]="'/addCuenta'"
     ></app-table-constructor>
   </div>
 </div>
 
-<app-delete-product (productoEliminado)="cargarProductos()">
-</app-delete-product>
+<app-delete-constructor
+  [title]="'la cuenta'"
+  (deleteFunc)="deleteClient($event)"
+  [delete]="'cuentaId'"
+>
+</app-delete-constructor>

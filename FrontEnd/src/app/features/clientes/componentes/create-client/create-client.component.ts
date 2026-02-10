@@ -240,6 +240,8 @@ export class CreateClientComponent implements OnInit {
   }
 
   goToList(): void {
+    this.generalService.clearObject();
+    this.isEdit = false;
     this.router.navigate(['/']);
   }
 

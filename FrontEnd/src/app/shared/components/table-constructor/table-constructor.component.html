@@ -61,7 +61,7 @@
           </ng-container>
 
           <ng-template #defaultCell>
-            {{ row[col.key] }}
+            {{ getNestedProperty(row, col.key) }}
           </ng-template>
         </td>
 

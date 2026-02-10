@@ -12,6 +12,7 @@ export class DeleteConstructorComponent implements OnInit {
   objAEliminar: any;
   @Output() deleteFunc = new EventEmitter<{ id: String }>();
   @Input() title: String = '';
+  @Input() delete: String = '';
 
   constructor(private generalService: GeneralService) {}
   ngOnInit(): void {
@@ -21,7 +22,7 @@ export class DeleteConstructorComponent implements OnInit {
   }
   async onConfirm(): Promise<void> {
     if (this.objAEliminar) {
-      this.deleteFunc.emit(this.objAEliminar.clienteId);
+      this.deleteFunc.emit(this.objAEliminar[this.delete as string]);
     }
   }
 

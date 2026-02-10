@@ -59,6 +59,23 @@ public class CuentaController {
         return ResponseEntity.ok(ApiResponse.success(cuentas));
     }
 
+    @GetMapping("/pageable/cedula/{identificacion}")
+    public ResponseEntity<ApiResponse<Page<CuentaResponseVo>>> obtenerCuentasByIdPageable(
+            @PathVariable String identificacion,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
+        Page<CuentaResponseVo> cuentas =
+                cuentaService.obtenerCuentasPorClienteIdentificacionPageable(
+                        identificacion,
+                        page,
+                        size
+                );
+
+        return ResponseEntity.ok(ApiResponse.success(cuentas));
+    }
+
+
     @GetMapping("/cliente/cedula/{identificacion}")
     public ResponseEntity<ApiResponse<List<CuentaResponseVo>>> obtenerCuentasPorCliente(
             @PathVariable String identificacion) {

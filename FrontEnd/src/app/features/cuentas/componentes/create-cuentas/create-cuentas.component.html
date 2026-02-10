@@ -1,0 +1,21 @@
+<app-form-constructor
+  [title]="'Registro cuenta'"
+  [formGroup]="formulario"
+  [fields]="formFields"
+  [buttons]="formButtons"
+  [clientInfoFields]="clientInfoFields"
+  (onSearchClient)="onSearchClient($event)"
+  (onSubmit)="enviar()"
+  (onBack)="onBack()"
+></app-form-constructor>
+
+<app-short-pop-up
+  [show]="mostrarPopup"
+  [type]="
+    typeModal === 'success' || typeModal === 'error' ? typeModal : 'error'
+  "
+  [message]="message"
+  [showAcceptButton]="true"
+  (close)="mostrarPopup = false"
+>
+</app-short-pop-up>

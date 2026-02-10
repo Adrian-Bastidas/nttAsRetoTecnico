@@ -15,6 +15,10 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -99,6 +103,43 @@ if(!Objects.equals(cuenta.getTipoCuenta(), dto.getTipo())){
         }
     }
 
+    public Page<MovimeintoResponseVo> obtenerPorNumeroCuentaPage(Long numeroCuenta, int page, int size) {
+        logger.info("Buscando movimientos para número de cuenta: {}", numeroCuenta);
+
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 50);
+
+        try {
+            Pageable pageable = PageRequest.of(
+                    safePage,
+                    safeSize,
+                    Sort.by("movimientoId").ascending()
+            );
+            logger.info("Consultando clientes paginados: page={}, size={}", safePage, safeSize);
+
+            Page<Movimiento> movimientos = movimientoRepository.findByCuentaId(numeroCuenta, pageable);
+
+            if (movimientos.isEmpty()) {
+                logger.warn("No se encontraron movimientos para la cuenta: {}", numeroCuenta);
+                throw new MovimientoNoEncontradoException("No hay movimientos registrados para esta cuenta");
+            }
+
+            if (movimientos.isEmpty()) {
+                logger.info(
+                        "No se encontraron movimientos con cuenta={} page={} size={}",
+                        numeroCuenta,
+                        safePage,
+                        safeSize
+                );
+                return Page.empty(pageable);
+            }
+            return movimientos.map(MovimientoMapper::toVo);
+        } catch (Exception e) {
+            logger.error("Error al obtener movimientos por cuenta: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
     public List<MovimeintoResponseVo> obtenerTodos() {
         logger.info("Obteniendo todos los movimientos");
 
@@ -110,6 +151,33 @@ if(!Objects.equals(cuenta.getTipoCuenta(), dto.getTipo())){
             return movimientos.stream()
                     .map(MovimientoMapper::toVo)
                     .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            logger.error("Error al obtener movimientos: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    public Page<MovimeintoResponseVo> obtenerTodosPaginado(int page, int size) {
+        logger.info("Obteniendo todos los movimientos");
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 50);
+        try {
+            Pageable pageable = PageRequest.of(
+                    safePage,
+                    safeSize,
+                    Sort.by("movimientoId").ascending()
+            );
+            logger.info("Consultando clientes paginados: page={}, size={}", safePage, safeSize);
+
+            Page<Movimiento> movimientos = movimientoRepository.findAll(pageable);
+            if (movimientos.isEmpty()) {
+                logger.info("No hay clientes para page={}, size={}", safePage, safeSize);
+                return Page.empty(pageable);
+            }
+
+
+            return movimientos.map(MovimientoMapper::toVo);
 
         } catch (Exception e) {
             logger.error("Error al obtener movimientos: {}", e.getMessage(), e);

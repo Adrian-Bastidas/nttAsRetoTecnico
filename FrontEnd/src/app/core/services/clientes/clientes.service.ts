@@ -7,6 +7,7 @@ import {
 } from '../../interfaces/clientes';
 import apiClient from '../../interceptors/axios.interceptor';
 import { BehaviorSubject } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -19,9 +20,12 @@ export class ClientesService {
   ): Promise<ClientePaginationResult> {
     return this.handleRequest<ClientePaginationResult>({
       request: () =>
-        apiClient.get<PageResponse<Cliente>>('/clientes/paginated', {
-          params: { page, size },
-        }),
+        apiClient.get<PageResponse<Cliente>>(
+          environment.API_BASE_URL + '/clientes/paginated',
+          {
+            params: { page, size },
+          },
+        ),
 
       successData: (pageResponse) => ({
         clientes: pageResponse.content ?? [],
@@ -46,7 +50,7 @@ export class ClientesService {
     return this.handleRequest<ClientePaginationResult>({
       request: () =>
         apiClient.get<PageResponse<Cliente>>(
-          `/clientes/paginated/${identificacion}`,
+          environment.API_BASE_URL + `/clientes/paginated/${identificacion}`,
           {
             params: { page, size },
           },
@@ -69,7 +73,8 @@ export class ClientesService {
 
   async createClients(body: Cliente): Promise<Cliente> {
     return this.handleRequest<Cliente>({
-      request: () => apiClient.post('/clientes', body),
+      request: () =>
+        apiClient.post(environment.API_BASE_URL + '/clientes', body),
       onSuccess: () =>
         this.popupService.showSuccess('Cliente creado con éxito'),
       errorMessage: 'Error al crear cliente',
@@ -79,7 +84,8 @@ export class ClientesService {
 
   async editClient(id: string, body: Cliente): Promise<Cliente> {
     return this.handleRequest<Cliente>({
-      request: () => apiClient.put(`/clientes/${id}`, body),
+      request: () =>
+        apiClient.put(environment.API_BASE_URL + `/clientes/${id}`, body),
       onSuccess: () =>
         this.popupService.showSuccess('Cliente editado con éxito'),
       errorMessage: 'Error al editar clientes',
@@ -89,7 +95,8 @@ export class ClientesService {
 
   async deleteClient(id: string): Promise<string> {
     return this.handleRequest<string>({
-      request: () => apiClient.delete(`/clientes/${id}`),
+      request: () =>
+        apiClient.delete(environment.API_BASE_URL + `/clientes/${id}`),
       successData: (data) => {
         const message = data?.message ?? 'Cliente eliminado con éxito';
         this.popupService.showSuccess(message);
@@ -97,6 +104,20 @@ export class ClientesService {
       },
       errorMessage: 'Error al eliminar cliente',
       fallback: '',
+    });
+  }
+
+  async loadClientesById(identificacion: string): Promise<Cliente> {
+    return this.handleRequest<Cliente>({
+      request: () =>
+        apiClient.get<Cliente>(
+          environment.API_BASE_URL + `/clientes/cedula/${identificacion}`,
+        ),
+
+      successData: (cliente) => cliente,
+
+      errorMessage: 'Error al cargar los clientes',
+      fallback: {} as Cliente,
     });
   }
 

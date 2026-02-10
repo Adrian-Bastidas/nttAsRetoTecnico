@@ -6,7 +6,6 @@ import { LoaderService } from '../services/loader.service';
 import { ShortPopUpService } from '../services/popup.service';
 
 const apiClient = axios.create({
-  baseURL: environment.API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -24,7 +23,7 @@ export function setupAxiosInterceptors() {
     (config) => {
       loaderService.show();
       console.log(
-        '🔄 Enviando request:',
+        ' Enviando request:',
         config.method?.toUpperCase(),
         config.url,
       );
@@ -39,7 +38,7 @@ export function setupAxiosInterceptors() {
 
   apiClient.interceptors.response.use(
     (response) => {
-      console.log('✅ Respuesta recibida:', response.status);
+      console.log('✅ Respuesta recibida:', response.status, response.data);
       loaderService.hide();
       return response;
     },

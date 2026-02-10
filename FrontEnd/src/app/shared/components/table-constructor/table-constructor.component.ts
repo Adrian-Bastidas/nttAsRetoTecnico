@@ -42,6 +42,9 @@ export class TableConstructorComponent implements OnInit {
   openMenuIndex: number | null = null;
   isLoading: boolean = true;
 
+  getNestedProperty(obj: any, path: string): any {
+    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+  }
   toggleMenu(index: number) {
     this.openMenuIndex = this.openMenuIndex === index ? null : index;
   }

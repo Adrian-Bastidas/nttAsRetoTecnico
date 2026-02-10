@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -48,12 +49,35 @@ public class MovimientoController {
 
         return ResponseEntity.ok(ApiResponse.success(movimientos));
     }
+    @GetMapping("/cuenta/paginate/{numeroCuenta}")
+    public ResponseEntity<ApiResponse<Page<MovimeintoResponseVo>>> obtenerPorNumeroCuentaPaginados(
+            @PathVariable Long numeroCuenta,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+
+        Page<MovimeintoResponseVo> movimientos =
+                movimientoService.obtenerPorNumeroCuentaPage(numeroCuenta, page, size);
+
+        return ResponseEntity.ok(ApiResponse.success(movimientos));
+    }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<MovimeintoResponseVo>>> obtenerTodos() {
 
         List<MovimeintoResponseVo> movimientos =
                 movimientoService.obtenerTodos();
+
+        return ResponseEntity.ok(ApiResponse.success(movimientos));
+    }
+
+    @GetMapping("/paginated")
+    public ResponseEntity<ApiResponse<Page<MovimeintoResponseVo>>> obtenerTodosPaginados(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
+
+        Page<MovimeintoResponseVo> movimientos =
+                movimientoService.obtenerTodosPaginado(page, size);
 
         return ResponseEntity.ok(ApiResponse.success(movimientos));
     }

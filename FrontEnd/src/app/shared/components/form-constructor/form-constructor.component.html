@@ -21,8 +21,50 @@
         (ngSubmit)="handleSubmit($event)"
         novalidate
       >
+        <div class="search-client-section" *ngIf="hasSearchClientField()">
+          <div class="form-group">
+            <label for="client-search-input">Buscar Cliente</label>
+            <div class="search-input-wrapper">
+              <input
+                id="client-search-input"
+                type="text"
+                [(ngModel)]="searchClientTerm"
+                [ngModelOptions]="{ standalone: true }"
+                [placeholder]="getSearchClientPlaceholder()"
+                [disabled]="isSearchClientDisabled()"
+                class="search-client-input"
+              />
+              <button
+                type="button"
+                class="btn-search-client"
+                (click)="handleSearchClient()"
+                [disabled]="
+                  !searchClientTerm ||
+                  searchClientTerm.trim() === '' ||
+                  isSearchClientDisabled()
+                "
+              >
+                <i class="fa fa-search" aria-hidden="true"></i>
+                Buscar
+              </button>
+            </div>
+          </div>
+
+          <div class="client-info" *ngIf="clientData">
+            <h3>Información del Cliente</h3>
+            <div class="client-info-grid">
+              <div class="info-item" *ngFor="let item of getClientInfoFields()">
+                <span class="info-label">{{ item.label }}:</span>
+                <span class="info-value">{{ item.value }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+        </div>
+
         <div class="form-grid" [ngStyle]="getGridStyle()">
-          <div class="form-group" *ngFor="let field of fields">
+          <div class="form-group" *ngFor="let field of getNonSearchFields()">
             <label [for]="field.name + '-input'">{{ field.label }}</label>
 
             <select

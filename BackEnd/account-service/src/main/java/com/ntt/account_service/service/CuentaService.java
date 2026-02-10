@@ -13,6 +13,7 @@ import com.ntt.account_service.model.Movimiento;
 import com.ntt.account_service.repository.CuentaRepository;
 import com.ntt.account_service.repository.MovimientoRepository;
 import com.ntt.account_service.utils.ApiResponse;
+import feign.FeignException;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,6 +152,58 @@ public class CuentaService {
             throw new ClienteNoEncontradoException("Error al obtener cuentas del cliente: " + e.getMessage());
         }
     }
+    public Page<CuentaResponseVo> obtenerCuentasPorClienteIdentificacionPageable(
+            String identificacion,
+            int page,
+            int size
+    ) {
+        logger.info("Buscando cuentas paginadas para cliente {}", identificacion);
+
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 50);
+
+        Pageable pageable = PageRequest.of(safePage, safeSize);
+
+        ClienteVo cliente;
+
+        try {
+            ApiResponse<?> response =
+                    userServiceClient.obtenerClienteIdentificacion(identificacion);
+
+            cliente = objectMapper.convertValue(
+                    response.getData(),
+                    ClienteVo.class
+            );
+
+        } catch (FeignException.NotFound e) {
+            logger.info("Cliente no encontrado con identificacion {}", identificacion);
+            return Page.empty(pageable);
+        }
+
+        if (cliente == null) {
+            return Page.empty(pageable);
+        }
+
+        Page<Cuenta> cuentasPage =
+                cuentaRepository.findByClienteIdAndEstado(
+                        cliente.getClienteId(),
+                        true,
+                        pageable
+                );
+
+        if (cuentasPage.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        return cuentasPage.map(cuenta -> {
+            CuentaResponseVo vo = cuentaMapper.entityToVO(cuenta);
+            vo.setCliente(cliente);
+            return vo;
+        });
+    }
+
+
+
 
     public List<CuentaResponseVo> obtenerCuentasPorClienteIdentificacion(String identificacion) {
         logger.info("Buscando cuentas activas para cliente identificacion: {}", identificacion);
@@ -318,28 +371,56 @@ public class CuentaService {
         );
 
         Page<Cuenta> cuentasPage = cuentaRepository.findAll(pageable);
-        logger.info("Consultando cuentas paginadas: page={}, size={}, elementos={}",
-                safePage, safeSize, cuentasPage.getNumberOfElements());
 
-        List<CuentaResponseVo> cuentasVOList = cuentasPage.stream().map(cuenta -> {
-            CuentaResponseVo vo = cuentaMapper.entityToVO(cuenta);
-            try {
-                ApiResponse<?> response = userServiceClient.obtenerCliente(cuenta.getClienteId());
-                ClienteVo cliente = objectMapper.convertValue(response.getData(), ClienteVo.class);
-                vo.setCliente(cliente);
-            } catch (Exception e) {
-                logger.warn("Error al obtener info cliente para cuenta ID {}: {}", cuenta.getCuentaId(), e.getMessage());
-                vo.setCliente(null);
-            }
-            return vo;
-        }).collect(Collectors.toList());
+        logger.info(
+                "Consultando cuentas paginadas: page={}, size={}, elementos={}",
+                safePage,
+                safeSize,
+                cuentasPage.getNumberOfElements()
+        );
 
-        // Devolver un Page<CuentaResponseVo> usando PageImpl para conservar paginación
+        List<CuentaResponseVo> cuentasVOList = cuentasPage.stream()
+                .map(cuenta -> {
+                    CuentaResponseVo vo = cuentaMapper.entityToVO(cuenta);
+
+                    try {
+                        ApiResponse<?> response =
+                                userServiceClient.obtenerCliente(cuenta.getClienteId());
+
+                        ClienteVo cliente = objectMapper.convertValue(
+                                response.getData(),
+                                ClienteVo.class
+                        );
+                        vo.setCliente(cliente);
+
+                    } catch (FeignException.NotFound e) {
+                        logger.info(
+                                "Cliente no encontrado para cuenta ID {}, clienteId={}",
+                                cuenta.getCuentaId(),
+                                cuenta.getClienteId()
+                        );
+                        vo.setCliente(null);
+
+                    } catch (Exception e) {
+                        logger.error(
+                                "Error al obtener cliente para cuenta ID {}: {}",
+                                cuenta.getCuentaId(),
+                                e.getMessage(),
+                                e
+                        );
+                        vo.setCliente(null);
+                    }
+
+                    return vo;
+                })
+                .collect(Collectors.toList());
+
         return new PageImpl<>(
                 cuentasVOList,
                 pageable,
                 cuentasPage.getTotalElements()
         );
     }
+
 
 }

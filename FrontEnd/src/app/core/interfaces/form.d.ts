@@ -6,15 +6,25 @@ export interface FormFieldOption {
 export interface FormField {
   name: string;
   label: string;
-  type?: 'text' | 'number' | 'email' | 'date' | 'tel' | 'password' | 'select';
-  maxLength?: number;
+  type:
+    | 'text'
+    | 'number'
+    | 'email'
+    | 'password'
+    | 'select'
+    | 'date'
+    | 'tel'
+    | 'search-client';
   placeholder?: string;
-  disabled?: boolean;
-  readonly?: boolean;
   errorMessage?: string;
-  options?: FormFieldOption[];
+  maxLength?: number;
+  readonly?: boolean;
+  options?: { value: any; label: string }[];
   customInputHandler?: (event: Event, formGroup: FormGroup) => void;
   customKeydownHandler?: (event: KeyboardEvent) => void;
+
+  isSearchClient?: boolean;
+  searchPlaceholder?: string;
 }
 
 export interface FormButton {
