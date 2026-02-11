@@ -10,14 +10,14 @@ COPY . .
 
 RUN npm run build
 
-FROM node:20-alpine
+FROM nginx:alpine
 
-WORKDIR /app
+COPY --from=build /app/dist/nttdata-test/browser /usr/share/nginx/html
 
-RUN npm install -g serve
+RUN rm /etc/nginx/conf.d/default.conf
 
-COPY --from=build /app/dist/nttdata-test/browser ./dist
+COPY nginx.conf /etc/nginx/conf.d
 
 EXPOSE 4200
 
-CMD ["serve", "-s", "dist", "-l", "4200"]
+CMD ["nginx", "-g", "daemon off;"]
