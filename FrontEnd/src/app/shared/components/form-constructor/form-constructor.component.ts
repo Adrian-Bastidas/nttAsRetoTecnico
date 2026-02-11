@@ -27,7 +27,6 @@ export class FormConstructorComponent implements OnInit {
   @Input() backButtonLabel: string = 'Regresar';
   @Input() gridColumns: number = 2;
 
-  // ✅ Nueva interfaz genérica para búsqueda
   @Input() searchConfig: SearchConfig = {
     enabled: false,
     fieldName: 'search',
@@ -52,7 +51,6 @@ export class FormConstructorComponent implements OnInit {
     return this.formGroup.controls;
   }
 
-  // ✅ Métodos genéricos para búsqueda
   hasSearchField(): boolean {
     return this.searchConfig.enabled;
   }
@@ -79,7 +77,6 @@ export class FormConstructorComponent implements OnInit {
     }
   }
 
-  // ✅ Métodos genéricos para datos
   setSearchData(data: any): void {
     this.searchData = data;
   }

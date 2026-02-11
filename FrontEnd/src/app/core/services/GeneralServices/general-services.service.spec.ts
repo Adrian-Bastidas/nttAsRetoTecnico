@@ -16,9 +16,6 @@ describe('GeneralService', () => {
     expect(service).toBeTruthy();
   });
 
-  // ============================
-  // objectToEdit
-  // ============================
   it('should set and get objectToEdit', () => {
     const mockObj = { id: 1, name: 'test' };
 
@@ -35,9 +32,6 @@ describe('GeneralService', () => {
     expect(service.getObject()).toBeNull();
   });
 
-  // ============================
-  // BehaviorSubject (delete obj)
-  // ============================
   it('should set and get delete object value', () => {
     const mockObj = { id: 10 };
 

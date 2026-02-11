@@ -65,9 +65,6 @@ describe('TableConstructorComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // =========================
-  // Loader
-  // =========================
   it('should update isLoading from LoaderService', () => {
     loadingSubject.next(true);
     expect(component.isLoading).toBe(true);
@@ -76,9 +73,6 @@ describe('TableConstructorComponent', () => {
     expect(component.isLoading).toBe(false);
   });
 
-  // =========================
-  // Utils
-  // =========================
   it('should return nested property value', () => {
     const obj = { user: { name: 'Juan' } };
     const result = component.getNestedProperty(obj, 'user.name');
@@ -90,9 +84,6 @@ describe('TableConstructorComponent', () => {
     expect(component.getInitials('')).toBe('JG');
   });
 
-  // =========================
-  // Menu
-  // =========================
   it('should toggle menu index', () => {
     component.toggleMenu(1);
     expect(component.openMenuIndex).toBe(1);
@@ -120,17 +111,11 @@ describe('TableConstructorComponent', () => {
     expect(component.openMenuIndex).toBeNull();
   });
 
-  // =========================
-  // Image
-  // =========================
   it('should mark image as failed', () => {
     component.onImageError('123');
     expect(component.imagenFallida['123']).toBe(true);
   });
 
-  // =========================
-  // Actions
-  // =========================
   it('should navigate to edit route and set object', () => {
     const row = { id: 1 };
     component.editRoute = '/edit';
@@ -151,9 +136,6 @@ describe('TableConstructorComponent', () => {
     expect(deleteFn).toHaveBeenCalledWith(row);
   });
 
-  // =========================
-  // Pagination
-  // =========================
   it('should go to next page', () => {
     const spy = jest.spyOn(component.pageChange, 'emit');
 
@@ -181,9 +163,6 @@ describe('TableConstructorComponent', () => {
     expect(spy).toHaveBeenCalledWith(1);
   });
 
-  // =========================
-  // Page size
-  // =========================
   it('should emit page size change', () => {
     const spy = jest.spyOn(component.pageSizeChange, 'emit');
 

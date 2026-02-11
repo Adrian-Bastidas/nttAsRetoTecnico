@@ -1,4 +1,3 @@
-// src/app/services/short-pop-up.service.ts
 import { Injectable, signal } from '@angular/core';
 
 export type PopupType = 'success' | 'error';
@@ -14,7 +13,6 @@ export interface PopupState {
   providedIn: 'root',
 })
 export class ShortPopUpService {
-  // Estado del popup que será consumido por el componente contenedor
   popupState = signal<PopupState>({
     show: false,
     type: 'success',
@@ -22,7 +20,6 @@ export class ShortPopUpService {
     showAcceptButton: true,
   });
 
-  // Método para mostrar mensajes de error
   showError(message: string, showAcceptButton = true): void {
     this.popupState.set({
       show: true,
@@ -31,7 +28,6 @@ export class ShortPopUpService {
       showAcceptButton,
     });
 
-    // Opcional: cerrar automáticamente después de un tiempo
     if (!showAcceptButton) {
       setTimeout(() => {
         this.hide();
@@ -39,7 +35,6 @@ export class ShortPopUpService {
     }
   }
 
-  // Método para mostrar mensajes de éxito
   showSuccess(message: string, showAcceptButton = true): void {
     this.popupState.set({
       show: true,
@@ -48,7 +43,6 @@ export class ShortPopUpService {
       showAcceptButton,
     });
 
-    // Los mensajes de éxito generalmente se cierran automáticamente
     if (!showAcceptButton) {
       setTimeout(() => {
         this.hide();
@@ -56,7 +50,6 @@ export class ShortPopUpService {
     }
   }
 
-  // Método para ocultar el popup
   hide(): void {
     this.popupState.update((state) => ({
       ...state,

@@ -47,9 +47,6 @@ describe('FormConstructorComponent', () => {
     },
   ];
 
-  // =====================
-  // INIT
-  // =====================
   it('should create component', () => {
     component.formGroup = createValidForm();
     fixture.detectChanges();
@@ -62,9 +59,6 @@ describe('FormConstructorComponent', () => {
     );
   });
 
-  // =====================
-  // SEARCH CONFIG
-  // =====================
   it('should detect search enabled', () => {
     component.formGroup = createValidForm();
     component.searchConfig = {
@@ -104,9 +98,6 @@ describe('FormConstructorComponent', () => {
     expect(spy).not.toHaveBeenCalled();
   });
 
-  // =====================
-  // SEARCH DATA
-  // =====================
   it('should map search data fields correctly', () => {
     component.formGroup = createValidForm();
     component.searchConfig = {
@@ -142,9 +133,6 @@ describe('FormConstructorComponent', () => {
     expect(component.searchTerm).toBe('');
   });
 
-  // =====================
-  // SUBMIT
-  // =====================
   it('should emit submit when form is valid', () => {
     component.formGroup = createValidForm();
     component.formGroup.setValue({ name: 'Juan', age: 20 });
@@ -164,9 +152,6 @@ describe('FormConstructorComponent', () => {
     expect(component.formGroup.touched).toBe(true);
   });
 
-  // =====================
-  // BUTTONS
-  // =====================
   it('should execute custom button action', () => {
     const action = jest.fn();
     const button: FormButton = {
@@ -193,9 +178,6 @@ describe('FormConstructorComponent', () => {
     expect(component.isButtonDisabled(submitButton)).toBe(true);
   });
 
-  // =====================
-  // BACK BUTTON
-  // =====================
   it('should emit back event', () => {
     component.formGroup = createValidForm();
 
@@ -206,9 +188,6 @@ describe('FormConstructorComponent', () => {
     expect(spy).toHaveBeenCalled();
   });
 
-  // =====================
-  // FIELDS
-  // =====================
   it('should detect invalid field when touched', () => {
     component.formGroup = createValidForm();
 
@@ -229,9 +208,6 @@ describe('FormConstructorComponent', () => {
     expect(component.getErrorMessage(field)).toBe('Error custom');
   });
 
-  // =====================
-  // GRID
-  // =====================
   it('should return correct grid style', () => {
     component.gridColumns = 3;
 
