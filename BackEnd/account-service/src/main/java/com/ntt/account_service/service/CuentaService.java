@@ -463,7 +463,7 @@ public class CuentaService {
                 Sort.by("cuentaId").ascending()
         );
 
-        Page<Cuenta> cuentasPage = cuentaRepository.findAll(pageable);
+        Page<Cuenta> cuentasPage = cuentaRepository.findByEstado(true, pageable);
 
         logger.info(
                 "Consultando cuentas paginadas: page={}, size={}, elementos={}",

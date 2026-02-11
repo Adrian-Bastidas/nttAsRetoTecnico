@@ -79,7 +79,7 @@ public class GlobalExceptionHandler {
                 .findFirst()
                 .orElse("Error de validación");
 
-        ApiResponse<Object> response = ApiResponse.success(errorMessage);
+        ApiResponse<Object> response = ApiResponse.error(errorMessage);
 
         return ResponseEntity.badRequest().body(response);
     }

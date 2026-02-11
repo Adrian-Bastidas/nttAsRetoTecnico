@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface CuentaRepository extends JpaRepository<Cuenta, Long> {
     List<Cuenta> findByClienteId(Long clienteId);
-
+    Page<Cuenta> findByEstado(Boolean estado, Pageable pageable);
     List<Cuenta> findByClienteIdAndEstado(Long clienteId, Boolean estado);
     Page<Cuenta> findByClienteIdAndEstado(Long clienteId, Boolean estado,  Pageable pageable);
     Optional<Cuenta> findByNumeroCuenta(String numeroCuenta);

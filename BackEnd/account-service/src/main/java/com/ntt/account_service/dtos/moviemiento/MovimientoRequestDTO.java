@@ -15,7 +15,6 @@ public class MovimientoRequestDTO {
     private Date fecha;
 
     @NotNull(message = "Valor es requerido")
-    @Positive(message = "Valor debe ser positivo")
     private Long valor;
 
     @NotBlank(message = "Tipo de movimiento es requerido")

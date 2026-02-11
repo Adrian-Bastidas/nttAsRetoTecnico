@@ -88,7 +88,7 @@ public class ClienteService {
 
         logger.info("Consultando clientes paginados: page={}, size={}", safePage, safeSize);
 
-        Page<Cliente> clientesPage = clienteRepository.findAll(pageable);
+        Page<Cliente> clientesPage = clienteRepository.findByEstadoTrue(pageable);
 
         if (clientesPage.isEmpty()) {
             logger.info("No hay clientes para page={}, size={}", safePage, safeSize);
