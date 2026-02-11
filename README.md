@@ -54,7 +54,7 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
 
 Antes de levantar los servicios:
 
-1. Crear una base de datos PostgreSQL.
+1. Crear una base de datos PostgreSQL con puerto 5432.
 2. Ejecutar el script:
 
 ```bash
@@ -78,20 +78,6 @@ El back-end está compuesto por **dos microservicios desarrollados con Spring Bo
 /Backend
 ```
 
-### ▶️ Levantar los microservicios
-
-Desde la **raíz del repositorio**, ejecutar:
-
-```bash
-docker compose -f docker-composer.yml up -d
-```
-
-Este comando:
-
-- Levanta ambos microservicios
-- Conecta los servicios a la base de datos PostgreSQL
-- Expone los endpoints necesarios para el front-end sin necesidad de entrar en un ambiente de desarrollo backend
-
 ### Ejecución de servicios
 
 Para visulizar todos los servicios que existen en ambos microfronts se puede usar la colección nttdata test.postman_collection.json
@@ -106,10 +92,10 @@ Cada microservicio incluye pruebas unitarias desarrolladas con:
 Para ejecutarlas:
 
 ```bash
-mvn test
+./gradlew test
 ```
 
-<img src='assets/testBack.png' width='150'>
+<img src='assets/testBack.png' width='400'>
 
 ---
 
@@ -122,19 +108,6 @@ El front-end se encuentra en la carpeta:
 ```
 
 Es una aplicación **Angular** que consume los microservicios del back-end.
-
-### ▶️ Ejecutar en desarrollo
-
-```bash
-npm install
-ng serve
-```
-
-La aplicación se levantará en:
-
-```bash
-http://localhost:4200
-```
 
 ### 📱 Pantallas Disponibles
 
@@ -151,7 +124,29 @@ El proyecto utiliza **Jest** para pruebas unitarias.
 npm run test
 ```
 
-<img src='assets/testFront.png' width='150'>
+<img src='assets/testFront.png' width='400'>
+
+### ▶️ Levantar Back-end y Front-end
+
+Desde la **raíz del repositorio**, ejecutar:
+
+```bash
+docker compose build --no-cache
+```
+
+Esto construirá las imagenes docker necesarias de los 2 microservicios y el Front-end, paso seguido ejecutar:
+
+```bash
+docker compose up
+```
+
+Este comando:
+
+- Levanta ambos microservicios en los puertos 8081 y 8082
+- Conecta los servicios a la base de datos PostgreSQL
+- Expone los endpoints necesarios para el front-end sin necesidad de entrar en un ambiente de desarrollo backend
+- Levanta el Front-End en el puerto 4200
+- Conecta el Front-End con los microservicios
 
 ---
 
