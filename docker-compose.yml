@@ -1,6 +1,4 @@
-
 services:
-
   user-service:
     build:
       context: ./BackEnd/user-service
@@ -9,6 +7,8 @@ services:
       SPRING_PROFILES_ACTIVE: dev
     ports:
       - "8081:8081"
+    networks:
+      - app-network
 
   account-service:
     build:
@@ -20,3 +20,9 @@ services:
       SPRING_PROFILES_ACTIVE: dev
     ports:
       - "8082:8082"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

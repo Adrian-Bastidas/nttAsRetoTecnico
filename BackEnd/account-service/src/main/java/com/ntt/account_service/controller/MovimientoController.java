@@ -30,7 +30,7 @@ public class MovimientoController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<MovimeintoResponseVo>> crearMovimiento(
-            @RequestBody MovimientoRequestDTO dto) {
+            @Valid @RequestBody MovimientoRequestDTO dto) {
 
         logger.info("Request para crear movimiento recibido: {}", dto);
         MovimeintoResponseVo response = movimientoService.crearMovimiento(dto);

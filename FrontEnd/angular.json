@@ -29,12 +29,7 @@
               "src/styles/global.css",
               "node_modules/font-awesome/css/font-awesome.min.css"
             ],
-            "scripts": [],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -76,7 +71,6 @@
               "buildTarget": "nttdataTest:build:development"
             }
           },
-
           "defaultConfiguration": "development"
         },
         "extract-i18n": {

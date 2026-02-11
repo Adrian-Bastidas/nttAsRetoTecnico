@@ -1,69 +1,177 @@
-# Tcs back-end test
+# NTTDATA – Reto Técnico Back-End & Front-End
 
-<div style="display:flex">
-<img src='assets/TCS.png' width='100'>
+<div style="display:flex; align-items:center; gap:12px">
+<img src='assets/logonttdata.png' width='120'>
 </div>
 
-In this repository you will find a technical test provided by Tcs Consultant Services
+Este repositorio contiene un **reto técnico para NTTDATA**, que incluye una arquitectura **back-end basada en microservicios con Spring Boot** y un **front-end desarrollado en Angular**.
 
-## Built With
-
-- Spring Boot
-- Spring Data JPA
-- Postgresql
-- Typescript
-- Git
-- junit
-- Feign Client
-
-## 🚀 Requirements
-
-Before running the project, make sure you have:
-
-- Java 17 or higher
-- Maven 3.6+
-- PostgreSQL database
-- (Optional) Docker to run the database locally
-- An IDE like IntelliJ or VSCode for development
+El objetivo del proyecto es demostrar buenas prácticas de desarrollo, separación de responsabilidades, pruebas unitarias y uso de contenedores.
 
 ---
 
-## ▶️ How to Run
+## 🛠️ Tecnologías Utilizadas
 
-1. **Clone the repository**
+### Back-end
+
+- Java 21
+- Spring Boot
+- Spring Data JPA
+- Spring Cloud OpenFeign
+- PostgreSQL
+- Maven
+- JUnit 5 + Mockito
+
+### Front-end
+
+- Angular
+- TypeScript
+- RxJS
+- Jest (pruebas unitarias)
+
+### DevOps / Otros
+
+- Docker & Docker Compose
+- Git
+
+---
+
+## 📋 Requisitos Previos
+
+Antes de ejecutar el proyecto, asegúrate de tener instalado:
+
+- Java 21 o superior
+- Maven 3.6+
+- Node.js 18+
+- Angular CLI
+- PostgreSQL
+- Docker y Docker Compose
+- IDE (IntelliJ IDEA, VSCode, etc.)
+
+---
+
+## 🗄️ Base de Datos
+
+Antes de levantar los servicios:
+
+1. Crear una base de datos PostgreSQL.
+2. Ejecutar el script:
 
 ```bash
-git clone git@github.com:Adrian-Bastidas/TATA-Back-End.git
+BaseDatos.sql
 ```
 
-2. **Go to the back-end project directory**
-3. **Configure your database**
+Este script:
+
+- Crea la base de datos **nttdb**
+- Genera el usuario y credenciales
+- Crea tablas y relaciones
+- Deja lista la estructura para que el back-end se conecte correctamente
+
+---
+
+## 🚀 Back-end
+
+El back-end está compuesto por **dos microservicios desarrollados con Spring Boot**, ubicados en la carpeta:
 
 ```bash
-Make sure you have a database set up and update your application.properties or application.yml with your database credentials.
-
-You can find the script in this repository
+/Backend
 ```
 
-4. **Run the application**
+### ▶️ Levantar los microservicios
 
-## 🚀 Available Endpoints
+Desde la **raíz del repositorio**, ejecutar:
 
 ```bash
-The Postman collection for testing the available endpoints is included in this repository.
+docker compose -f docker-composer.yml up -d
 ```
 
-## 🚀 Examples
+Este comando:
 
-<img src='assets/counts.png' width='800'>
-<img src='assets/report.png' width='800'>
-<img src='assets/movement.png' width='800'>
-<img src='assets/client.png' width='800'>
+- Levanta ambos microservicios
+- Conecta los servicios a la base de datos PostgreSQL
+- Expone los endpoints necesarios para el front-end sin necesidad de entrar en un ambiente de desarrollo backend
 
-## Author
+### Ejecución de servicios
 
-👤 **Adrian Rafael Bastidas Moya**
+Para visulizar todos los servicios que existen en ambos microfronts se puede usar la colección nttdata test.postman_collection.json
+
+### 🧪 Pruebas unitarias Back-end
+
+Cada microservicio incluye pruebas unitarias desarrolladas con:
+
+- JUnit 5
+- Mockito
+
+Para ejecutarlas:
+
+```bash
+mvn test
+```
+
+<img src='assets/testBack.png' width='150'>
+
+---
+
+## 🌐 Front-end
+
+El front-end se encuentra en la carpeta:
+
+```bash
+/Frontend
+```
+
+Es una aplicación **Angular** que consume los microservicios del back-end.
+
+### ▶️ Ejecutar en desarrollo
+
+```bash
+npm install
+ng serve
+```
+
+La aplicación se levantará en:
+
+```bash
+http://localhost:4200
+```
+
+### 📱 Pantallas Disponibles
+
+- Gestión de Clientes
+- Gestión de Cuentas
+- Movimientos
+- Reportes
+
+### 🧪 Pruebas unitarias Front-end
+
+El proyecto utiliza **Jest** para pruebas unitarias.
+
+```bash
+npm run test
+```
+
+<img src='assets/testFront.png' width='150'>
+
+---
+
+## 📸 Ejemplos de la Aplicación
+
+<img src='assets/clientes.png' width='800'>
+<img src='assets/cuentas.png' width='800'>
+<img src='assets/movimientos.png' width='800'>
+<img src='assets/reportes.png' width='800'>
+
+---
+
+## 👤 Autor
+
+**Adrian Rafael Bastidas Moya**
 
 - GitHub: [@Adrian-Bastidas](https://github.com/Adrian-Bastidas)
-- Facebook: [Adrian Bastidas](https://www.facebook.com/rafdrian/)
 - LinkedIn: [Adrian Rafael Bastidas Moya](https://www.linkedin.com/in/adrian-rafael-bastidas-moya-5b940419b/)
+- Facebook: [Adrian Bastidas](https://www.facebook.com/rafdrian/)
+
+---
+
+📌 _Proyecto desarrollado como reto técnico para NTTDATA._

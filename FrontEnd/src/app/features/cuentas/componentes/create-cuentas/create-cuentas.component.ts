@@ -150,7 +150,6 @@ export class CreateCuentasComponent implements OnInit {
           this.showSuccess('Cliente encontrado correctamente');
         }
       } else {
-        this.showError('No se encontró ningún cliente con esa identificación');
         this.formConstructor.clearSearchData();
       }
     } catch (error) {
@@ -212,7 +211,6 @@ export class CreateCuentasComponent implements OnInit {
         }
       } else {
         await this.cuentasService.createCuentas(cuentaData);
-        this.showSuccess('Cuenta creada correctamente');
         this.formulario.reset();
         if (this.formConstructor) {
           this.formConstructor.clearSearchData();
