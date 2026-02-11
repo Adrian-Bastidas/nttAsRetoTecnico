@@ -1,9 +1,4 @@
-server:
-  port: 8082
-
 spring:
-  profiles:
-    active: dev
   application:
     name: account-service
 
@@ -16,20 +11,10 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-user-service:
-  url: http://localhost:8081
-
 feign:
-  hystrix:
-    enabled: true
   client:
     config:
       default:
         connect-timeout: 5000
         read-timeout: 5000
         logger-level: basic
-
-logging:
-  level:
-    com.tcs.account_service.client: DEBUG
-    feign: DEBUG

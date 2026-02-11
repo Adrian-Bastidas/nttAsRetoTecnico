@@ -46,6 +46,8 @@ public class CuentaService {
     private static final Logger logger = LoggerFactory.getLogger(CuentaService.class);
     @Autowired
     private MovimientoRepository movimientoRepository;
+    @Autowired
+    private ReportePdfService reportePdfService;
 
 
     @Transactional
@@ -348,6 +350,69 @@ public class CuentaService {
 
         return resultado;
     }
+
+    public Page<EstadoCuentaReporteVO> generarReportePage(Long clienteId, Date desde, Date hasta, int page, int size) {
+        logger.info("Generando reporte de estado de cuenta para cliente ID: {}", clienteId);
+
+        ClienteVo cliente;
+        try {
+            ApiResponse<?> response = userServiceClient.obtenerCliente(clienteId);
+
+            cliente = objectMapper.convertValue(
+                    response.getData(),
+                    ClienteVo.class
+            );
+
+            if (cliente == null) {
+                logger.warn("Cliente con ID {} no encontrado", clienteId);
+                throw new ClienteNoEncontradoException("Cliente con ID " + clienteId + " no encontrado");
+            }
+            logger.info("Cliente obtenido: {}", cliente.getClienteId());
+        } catch (Exception e) {
+            logger.error("Error al obtener cliente por Feign: {}", e.getMessage(), e);
+            throw new ClienteNoEncontradoException("Error al obtener cliente: " + e.getMessage());
+        }
+
+        List<Cuenta> cuentas = cuentaRepository.findByClienteId(clienteId);
+
+        if (cuentas.isEmpty()) {
+            logger.warn("No se encontraron cuentas para el cliente {}", clienteId);
+            return new PageImpl<>(new ArrayList<>(), PageRequest.of(page, size), 0);
+        }
+
+        // Obtener los IDs de las cuentas
+        List<Long> cuentaIds = cuentas.stream().map(Cuenta::getCuentaId).collect(Collectors.toList());
+
+        // Obtener movimientos paginados desde la BD
+        Pageable pageable = PageRequest.of(page, size, Sort.by("fecha").ascending());
+        Page<Movimiento> movimientosPage = movimientoRepository
+                .findByCuentaIdInAndFechaBetween(cuentaIds, desde, hasta, pageable);
+
+        logger.info("Movimientos encontrados: {}", movimientosPage.getTotalElements());
+
+        // Mapear a VO
+        List<EstadoCuentaReporteVO> resultado = movimientosPage.getContent().stream()
+                .map(movimiento -> {
+                    Cuenta cuenta = cuentas.stream()
+                            .filter(c -> c.getCuentaId().equals(movimiento.getCuenta().getCuentaId()))
+                            .findFirst()
+                            .orElse(null);
+
+                    return new EstadoCuentaReporteVO(
+                            movimiento.getFecha(),
+                            cliente.getNombre(),
+                            cuenta.getNumeroCuenta(),
+                            cuenta.getTipoCuenta(),
+                            cuenta.getSaldoInicial(),
+                            cuenta.getEstado(),
+                            movimiento.getValor(),
+                            movimiento.getSaldo()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultado, movimientosPage.getPageable(), movimientosPage.getTotalElements());
+    }
     @Transactional
     public CuentaResponseVo actualizarCuenta(Long cuentaId, CuentaRequestDTO cuentaDTO) {
         logger.info("Actualizando cuenta con ID: {}", cuentaId);
@@ -450,5 +515,26 @@ public class CuentaService {
         );
     }
 
+    public byte[] generarReportePdf(Long clienteId, Date desde, Date hasta) throws Exception {
+        logger.info("Generando PDF de reporte para cliente ID: {}", clienteId);
 
+        // Obtener los datos del reporte
+        List<EstadoCuentaReporteVO> reportes = generarReporte(clienteId, desde, hasta);
+
+        // Obtener datos del cliente
+        ClienteVo cliente;
+        try {
+            ApiResponse<?> response = userServiceClient.obtenerCliente(clienteId);
+            cliente = objectMapper.convertValue(response.getData(), ClienteVo.class);
+        } catch (Exception e) {
+            logger.error("Error al obtener cliente para PDF: {}", e.getMessage());
+            throw new ClienteNoEncontradoException("Error al obtener cliente: " + e.getMessage());
+        }
+
+        // Generar PDF
+        byte[] pdfBytes = reportePdfService.generarReportePdf(reportes, cliente, desde, hasta);
+        logger.info("PDF generado exitosamente, tamaño: {} bytes", pdfBytes.length);
+
+        return pdfBytes;
+    }
 }

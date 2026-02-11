@@ -4,6 +4,7 @@ import {
   CreateCuenta,
   CuentaResponseVo,
   CuentasPaginationResult,
+  ReportsPaginationResult,
 } from '../../interfaces/cuentas';
 import apiClient from '../../interceptors/axios.interceptor';
 import { PageResponse } from '../../interfaces/clientes';
@@ -119,6 +120,74 @@ export class CuentasService {
       errorMessage: 'Error al cargar las cuentas',
       fallback: {} as CuentaResponseVo,
     });
+  }
+
+  async loadPaginatedReports(
+    clienteId: string,
+    desde: string,
+    hasta: string,
+    page: number,
+    size: number,
+  ): Promise<ReportsPaginationResult> {
+    return this.handleRequest<ReportsPaginationResult>({
+      request: () =>
+        apiClient.get<PageResponse<ReportsPaginationResult>>(
+          environment.API_BASE_URL_2 +
+            `/cuentas/reportes/paginated/estado-cuenta`,
+          {
+            params: { clienteId, desde, hasta, page, size },
+          },
+        ),
+
+      successData: (pageResponse) => ({
+        reportes: pageResponse.content ?? [],
+        totalElements: pageResponse.totalElements ?? 0,
+        totalPages: pageResponse.totalPages ?? 0,
+      }),
+
+      errorMessage: 'Error al cargar los cuentas',
+      fallback: {
+        reportes: [],
+        totalElements: 0,
+        totalPages: 0,
+      },
+    });
+  }
+  async descargarReportePdf(
+    clienteId: string,
+    desde: string,
+    hasta: string,
+  ): Promise<void> {
+    try {
+      const response = await apiClient.get<Blob>(
+        environment.API_BASE_URL_2 + `/cuentas/estado-cuenta/pdf`,
+        {
+          params: {
+            clienteId,
+            desde,
+            hasta,
+          },
+          responseType: 'blob' as any,
+        },
+      );
+
+      const url = window.URL.createObjectURL(response.data);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `reporte_estado_cuenta_${desde}_${hasta}.pdf`;
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      window.URL.revokeObjectURL(url);
+
+      console.log('✅ PDF descargado correctamente');
+    } catch (error: any) {
+      console.error('❌ Error al descargar PDF:', error);
+      throw error;
+    }
   }
 
   private async handleRequest<T>({

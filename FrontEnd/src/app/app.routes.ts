@@ -5,6 +5,7 @@ import { CuentasListComponent } from './features/cuentas/componentes/cuentas-lis
 import { CreateCuentasComponent } from './features/cuentas/componentes/create-cuentas/create-cuentas.component';
 import { MovimientosListComponent } from './features/movimientos/componentes/movimientos-list/movimientos-list.component';
 import { CreateMovimientoComponent } from './features/movimientos/componentes/create-movimiento/create-movimiento.component';
+import { ReportsComponent } from './features/reportes/componentes/reports/reports.component';
 
 export const routes: Routes = [
   {
@@ -30,5 +31,9 @@ export const routes: Routes = [
   {
     path: 'addMovimiento',
     component: CreateMovimientoComponent,
+  },
+  {
+    path: 'reportes',
+    component: ReportsComponent,
   },
 ];

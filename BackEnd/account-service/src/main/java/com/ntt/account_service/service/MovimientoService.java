@@ -45,26 +45,22 @@ public class MovimientoService {
     public MovimeintoResponseVo crearMovimiento(MovimientoRequestDTO dto) {
         logger.info("Iniciando creación de movimiento para cuenta: {}", dto.getNumeroCuenta());
 
-        // Buscar cuenta por número de cuenta
         Cuenta cuenta = cuentaRepository.findByNumeroCuenta(dto.getNumeroCuenta())
                 .orElseThrow(() ->
                         new CuentaNoEncontradaException("Cuenta no encontrada con número: " + dto.getNumeroCuenta())
                 );
 
-        // Validar que el tipo de movimiento coincida con el tipo de cuenta
         if (!Objects.equals(cuenta.getTipoCuenta(), dto.getTipo())) {
             logger.warn("El tipo de cuenta registrado no coincide con la del movimiento: {}", dto.getTipo());
             throw new DiferentesTiposException("Se está tratando de realizar un movimiento de tipo " +
                     dto.getTipo() + " en una cuenta de tipo " + cuenta.getTipoCuenta());
         }
 
-        // Obtener saldo actual real - último movimiento de esta cuenta
         Long saldoActual = movimientoRepository
                 .findTopByCuentaIdOrderByFechaDesc(cuenta.getCuentaId())
                 .map(Movimiento::getSaldo)
                 .orElse(cuenta.getSaldoInicial());
 
-        // Calcular nuevo saldo
         Long nuevoSaldo = saldoActual + dto.getValor();
 
         if (nuevoSaldo < 0) {
@@ -72,7 +68,6 @@ public class MovimientoService {
             throw new SaldoInsuficiente("Saldo insuficiente para realizar el movimiento");
         }
 
-        // Crear movimiento
         Movimiento movimiento = MovimientoMapper.toEntity(dto);
         movimiento.setCuenta(cuenta);
         movimiento.setSaldo(nuevoSaldo);

@@ -9,7 +9,9 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,7 @@ import java.util.List;
 public class CuentaController {
     @Autowired
     private CuentaService cuentaService;
+
 
     @PostMapping
     public ResponseEntity<ApiResponse<CuentaResponseVo>> crearCuenta(
@@ -106,6 +109,41 @@ public class CuentaController {
         return ResponseEntity.ok(ApiResponse.success(reporte));
     }
 
+    @GetMapping("/reportes/paginated/estado-cuenta")
+    public ResponseEntity<ApiResponse<Page<EstadoCuentaReporteVO>>> generarReporteEstadoCuentaPage(
+            @RequestParam Long clienteId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date hasta, @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size ) {
+
+        Page<EstadoCuentaReporteVO> reporte =
+                cuentaService.generarReportePage(clienteId, desde, hasta, page,size);
+
+        return ResponseEntity.ok(ApiResponse.success(reporte));
+    }
+    @GetMapping("/estado-cuenta/pdf")
+    public ResponseEntity<byte[]> descargarReportePdf(
+            @RequestParam Long clienteId,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date desde,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date hasta) {
+
+        try {
+
+            byte[] pdfBytes = cuentaService.generarReportePdf(clienteId, desde, hasta);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "reporte_estado_cuenta.pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
     @PutMapping("/{cuentaId}")
     public ResponseEntity<ApiResponse<CuentaResponseVo>> actualizarCuenta(
             @PathVariable Long cuentaId,

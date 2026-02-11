@@ -34,4 +34,10 @@ public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
     Optional<Movimiento> findTopByCuentaIdAndFechaBeforeOrderByFechaDesc(
             @Param("cuentaId") Long cuentaId,
             @Param("fecha") Date fecha);
+    @Query("SELECT m FROM Movimiento m WHERE m.cuenta.cuentaId IN :cuentaIds AND m.fecha BETWEEN :desde AND :hasta ORDER BY m.fecha ASC")
+    Page<Movimiento> findByCuentaIdInAndFechaBetween(
+            @Param("cuentaIds") List<Long> cuentaIds,
+            @Param("desde") Date desde,
+            @Param("hasta") Date hasta,
+            Pageable pageable);
 }

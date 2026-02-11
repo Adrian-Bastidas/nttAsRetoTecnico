@@ -1,0 +1,48 @@
+<div *ngIf="!showTable">
+  <app-form-constructor
+    [title]="'Filtrar Movimientos'"
+    [formGroup]="filterForm"
+    [fields]="fields"
+    [buttons]="buttons"
+    [showBackButton]="false"
+    [backButtonLabel]="'Regresar'"
+    [gridColumns]="2"
+    [searchConfig]="searchConfig"
+    (onSearch)="onSearch($event)"
+    (onSubmit)="aplicarFiltros()"
+  >
+  </app-form-constructor>
+</div>
+
+<div *ngIf="showTable" class="list-component">
+  <div class="search-products">
+    <button class="add-button" (click)="volverAFiltros()">
+      Volver a Filtros
+    </button>
+    <button class="download-button" (click)="descargarReporte()">
+      Descargar reporte
+    </button>
+  </div>
+  <div class="product-list-container">
+    <app-table-constructor
+      [columns]="columns"
+      [data]="filteredRows"
+      [currentPage]="currentPage"
+      [maxPage]="maxPage"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+    >
+    </app-table-constructor>
+  </div>
+</div>
+
+<app-short-pop-up
+  [show]="mostrarPopup"
+  [type]="
+    typeModal === 'success' || typeModal === 'error' ? typeModal : 'error'
+  "
+  [message]="message"
+  [showAcceptButton]="true"
+  (close)="mostrarPopup = false"
+>
+</app-short-pop-up>
